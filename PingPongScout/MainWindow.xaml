@@ -5,8 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PingPongScout"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
+        Title="Ping Pong | KINECT" 
+        Height="800" Width="1200"
+        WindowState="Maximized"
+        Closing="WindowClosing">
+    <Grid Background="Black">
+        <Viewbox>
+            <Grid Width="1920" Height="1080">
+                <Image Name="camera" Stretch="Uniform" />
+                <Canvas Name="canvas">
+                </Canvas>
+            </Grid>
+        </Viewbox>
     </Grid>
 </Window>

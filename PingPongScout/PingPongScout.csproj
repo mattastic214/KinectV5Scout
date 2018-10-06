@@ -35,6 +35,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LightBuzz.Vitruvius">
+      <HintPath>..\..\..\libraries\Vitruvius_(Premium)\LightBuzz.Vitruvius.5.0.1\LightBuzz.Vitruvius.4.5.0-Legacy\Assemblies\WPF\LightBuzz.Vitruvius.dll</HintPath>
+    </Reference>
+    <Reference Include="LightBuzz.Vitruvius.Controls">
+      <HintPath>..\..\..\libraries\Vitruvius_(Premium)\LightBuzz.Vitruvius.5.0.1\LightBuzz.Vitruvius.4.5.0-Legacy\Assemblies\WPF\LightBuzz.Vitruvius.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Kinect, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -93,6 +100,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BallDetection\BallDetection.csproj">
+      <Project>{61f9e6e2-f26c-46ea-88bf-da4a76d2d150}</Project>
+      <Name>BallDetection</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
