@@ -33,8 +33,20 @@ namespace PingPongScout
         private IList<Body> _bodyData = null;
         private WriteableBitmap _bitmap = null;
         private ushort[] _depthData = null;
+        private ushort[] _infraredData = null;
+        private ushort[] _longExposureData = null;
         private byte[] _bodyIndexData = null;
-        
+
+        #endregion
+
+        #region Delegates
+
+        delegate void constructorOperationDelegate();
+        private constructorOperationDelegate constructorOperation;
+
+        delegate void generateBodyDataDelegate();
+        private generateBodyDataDelegate generateBodyData;
+
         #endregion
 
         #region Constructor
@@ -42,31 +54,43 @@ namespace PingPongScout
         public MainWindow()
         {
             InitializeComponent();
+
+            constructorOperation += OpenKinect;
+            constructorOperation += InitializeMultiSourceReader;
             
             _kinectSensor = KinectSensor.GetDefault();
 
             if (_kinectSensor != null)
             {
-                _kinectSensor.Open();
-                _coordinateMapper = _kinectSensor.CoordinateMapper;
+                this.constructorOperation();
+                // Generic start
+                //_kinectSensor.Open();
+                //_coordinateMapper = _kinectSensor.CoordinateMapper;
 
-                _multiSourceFrameReader = _kinectSensor
-                    .OpenMultiSourceFrameReader(FrameSourceTypes.Body | FrameSourceTypes.BodyIndex | FrameSourceTypes.Depth | FrameSourceTypes.Infrared | FrameSourceTypes.LongExposureInfrared);
+                // Setup the multiSourceFrameReader
+                //_multiSourceFrameReader = _kinectSensor
+                //    .OpenMultiSourceFrameReader(FrameSourceTypes.Body | FrameSourceTypes.BodyIndex | FrameSourceTypes.Depth | FrameSourceTypes.Infrared | FrameSourceTypes.LongExposureInfrared);
+                //_multiSourceFrameReader.MultiSourceFrameArrived += MultiSourceFrameArrived;
 
-                _multiSourceFrameReader.MultiSourceFrameArrived += MultiSourceFrameArrived;
-
+                // Width and Height from sensor -> to camrera!
                 int depthWidth = _kinectSensor.DepthFrameSource.FrameDescription.Width;
                 int depthHeight = _kinectSensor.DepthFrameSource.FrameDescription.Height;
 
+                // Get a bitmap with width and height.
                 _bitmap = new WriteableBitmap(depthWidth, depthHeight, 96.0, 96.0, PixelFormats.Bgr32, null);
 
+                // Kinect sensor Data of interest, 3 of 5. 
                 _bodyData = new Body[_kinectSensor.BodyFrameSource.BodyCount];
+                _infraredData = new ushort[depthWidth * depthHeight];
                 _depthData = new ushort[depthWidth * depthHeight];
                 _bodyIndexData = new byte[depthWidth * depthHeight];
+                _longExposureData = new ushort[depthWidth * depthHeight];
 
+                // Get the BallDetection class set up.
                 _ballDetectionEngine = new BallDetectionEngine(_coordinateMapper, depthWidth, depthHeight);
                 _ballDetectionEngine.BallDetected += BallDetectEvent;
 
+                // Assign the bitmap to the camera! Of course!!
                 camera.Source = _bitmap;
             }
         }
@@ -98,15 +122,17 @@ namespace PingPongScout
 
                 using (var bodyFrame = frame.BodyFrameReference.AcquireFrame())
                 {
+                    // Placeholder for refactoring.
+                    // Handle all logic in another method. Functional Programming?
+                    //bodyFrame?.Dispose();
+
                     if (bodyFrame != null)
                     {
                         bodyFrame.GetAndRefreshBodyData(_bodyData);
-                        _body = _bodyData.Where(b => b.IsTracked).FirstOrDefault();
 
-                        if (_body != null)
-                        {
-                            Console.WriteLine("Found One Person.");
-                        }
+                        var bodyIEnum = _bodyData.Where(b => b.IsTracked);
+                        var otVitBodies = bodyIEnum.Select(b => BodyWrapper.Create(b, _coordinateMapper, Visualization.Infrared));
+                        // Ok, you have the bodies you want. What do you want to do with them now?
                     }
 
 
@@ -137,11 +163,22 @@ namespace PingPongScout
 
         #endregion
 
-        private void BallDetectEvent(object sender, BallDetectionResult c)
+        private void BallDetectEvent(object sender, BallDetectionResult e)
         {
 
         }
 
-        
+        private void OpenKinect()
+        {
+            _kinectSensor.Open();
+            _coordinateMapper = _kinectSensor.CoordinateMapper;
+        }
+
+        private void InitializeMultiSourceReader()
+        {
+            _multiSourceFrameReader = _kinectSensor
+                    .OpenMultiSourceFrameReader(FrameSourceTypes.Body | FrameSourceTypes.BodyIndex | FrameSourceTypes.Depth | FrameSourceTypes.Infrared | FrameSourceTypes.LongExposureInfrared);
+            _multiSourceFrameReader.MultiSourceFrameArrived += MultiSourceFrameArrived;
+        }
     }
 }
