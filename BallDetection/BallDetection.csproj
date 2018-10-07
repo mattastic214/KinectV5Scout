@@ -35,6 +35,7 @@
       <HintPath>..\..\..\libraries\Vitruvius_(Premium)\LightBuzz.Vitruvius.5.0.1\LightBuzz.Vitruvius.4.5.0-Legacy\Assemblies\WPF\LightBuzz.Vitruvius.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Kinect, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
