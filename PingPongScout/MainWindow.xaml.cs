@@ -14,6 +14,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Collections.Generic;
+using Emgu.CV;
 using System.Runtime.InteropServices;
 
 namespace PingPongScout
@@ -23,7 +24,7 @@ namespace PingPongScout
     /// </summary>
     public partial class MainWindow : Window
     {
-
+        
         #region Members
 
         private List<Ellipse> _points = new List<Ellipse>();
@@ -50,7 +51,6 @@ namespace PingPongScout
         private constructorOperationDelegate constructorOperation;
 
         delegate void initializeFrameDataDelegate(int depthWidth, int depthHeight);
-        private initializeFrameDataDelegate initializeFrameData;
 
         delegate void generateBodyDataDelegate();
         private generateBodyDataDelegate generateBodyData;
@@ -63,13 +63,7 @@ namespace PingPongScout
         {
             InitializeComponent();
 
-            constructorOperation += OpenKinect;
-            constructorOperation += InitializeMultiSourceReader;
 
-            initializeFrameData += InitializeBitmap;
-            initializeFrameData += InitializeFrameData;
-            initializeFrameData += InitializeBallDetection;
-            
             _kinectSensor = KinectSensor.GetDefault();
 
             if (_kinectSensor != null)
@@ -77,8 +71,13 @@ namespace PingPongScout
                 int depthWidth = _kinectSensor.DepthFrameSource.FrameDescription.Width;
                 int depthHeight = _kinectSensor.DepthFrameSource.FrameDescription.Height;
 
+                constructorOperation += OpenKinect;
+                constructorOperation += InitializeMultiSourceReader;
+                constructorOperation += (() => { InitializeBitmap(depthWidth, depthHeight); });
+                constructorOperation += (() => { InitializeFrameData(depthWidth, depthHeight); });
+                constructorOperation += (() => { InitializeBallDetection(depthWidth, depthHeight); });
+
                 constructorOperation();
-                initializeFrameData(depthWidth, depthHeight);
             }
         }
 
@@ -102,10 +101,11 @@ namespace PingPongScout
         private void MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
         {
             MultiSourceFrame frame = e.FrameReference.AcquireFrame();
-
+            
             if (frame != null )
             {
 
+                // Async 1
                 using (var bodyFrame = frame.BodyFrameReference.AcquireFrame())
                 {
                     // Placeholder for refactoring.
@@ -126,36 +126,6 @@ namespace PingPongScout
                                 Console.WriteLine("Got bodyWrapper.");
                                 var joints = bodyWrapper.Joints;
 
-                                //var handTipLeft = joints[JointType.HandTipLeft];
-                                //var handTipRight = joints[JointType.HandTipRight];
-                                //var handLeft = joints[JointType.HandLeft];
-                                //var handRight = joints[JointType.HandRight];
-
-                                //var wristLeft = joints[JointType.WristLeft];
-                                //var wristRight = joints[JointType.WristRight];
-                                //var elbowLeft = joints[JointType.ElbowLeft];
-                                //var elbowRight = joints[JointType.ElbowRight];
-                                //var shoulderLeft = joints[JointType.ShoulderLeft];
-                                //var shoulderRight = joints[JointType.ShoulderRight];
-
-                                //var spineShoulder = joints[JointType.SpineShoulder];
-                                //var spineBase = joints[JointType.SpineBase];
-                                //var spineMid = joints[JointType.SpineMid];
-                                //var neck = joints[JointType.Neck];
-                                //var head = joints[JointType.Head];
-
-                                //var hipLeft = joints[JointType.HipLeft];
-                                //var hipRight = joints[JointType.HipRight];
-
-                                
-
-                                //KinectViewer kinectViewer = new KinectViewer();
-                                //kinectViewer.CoordinateMapper = _coordinateMapper;
-                                //kinectViewer.Image;
-                                //kinectViewer.Visualization = Visualization.Infrared;
-                                //kinectViewer.DrawBody(bodyWrapper);
-                                //kinectViewer.InitializeComponent();
-
                                 var jointsAll = joints.Values;
 
                                 var trackedJoints = jointsAll.Where(j => j.TrackingState != TrackingState.NotTracked);
@@ -171,7 +141,7 @@ namespace PingPongScout
                 }
 
 
-
+                // Async 2
                 using (var bodyIndexFrame = frame.BodyIndexFrameReference.AcquireFrame())
                 using (var depthFrame = frame.DepthFrameReference.AcquireFrame())
                 {
@@ -187,6 +157,7 @@ namespace PingPongScout
 
                 }
                 
+                // Async 3
                 using (var infraredFrame = frame.InfraredFrameReference.AcquireFrame())
                 {
                     // A job for Async?
@@ -199,6 +170,7 @@ namespace PingPongScout
                     }                    
                 }
 
+                // Async 4
                 using (var longExposureFrame = frame.LongExposureInfraredFrameReference.AcquireFrame())
                 {
                         
