@@ -30,6 +30,7 @@ namespace PingPongScout
         private List<Ellipse> _points = new List<Ellipse>();
 
         private KinectSensor _kinectSensor = null;
+        private KinectViewer _kinectViewer = null;
         private MultiSourceFrameReader _multiSourceFrameReader = null;
         private CoordinateMapper _coordinateMapper = null;
 
@@ -179,7 +180,7 @@ namespace PingPongScout
                             if (bodyWrapper.IsTracked)
                             {
                                 canvas.Children.Clear();
-
+                                
                                 // 2D space point
                                 Point point = new Point();
 
@@ -210,8 +211,8 @@ namespace PingPongScout
                                         Height = 20
                                     };
 
-                                    Canvas.SetLeft(ellipse, point.X - ellipse.Width / 2);
-                                    Canvas.SetTop(ellipse, point.Y - ellipse.Height / 2);
+                                    Canvas.SetLeft(ellipse, point.X - ellipse.Width);
+                                    Canvas.SetTop(ellipse, point.Y - ellipse.Height);
 
                                     canvas.Children.Add(ellipse);
                                 }
@@ -256,6 +257,9 @@ namespace PingPongScout
         {
             _kinectSensor.Open();
             _coordinateMapper = _kinectSensor.CoordinateMapper;
+            _kinectViewer = new KinectViewer();
+            _kinectViewer.InitializeComponent();
+            _kinectViewer.Visualization = Visualization.Depth;
         }
 
         private void InitializeMultiSourceReader()

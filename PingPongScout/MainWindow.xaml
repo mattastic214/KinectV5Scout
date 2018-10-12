@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Title="Ping Pong | KINECT" 
         Height="800" Width="1200"
-        WindowState="Maximized"
+        WindowState="Normal"
         Loaded="Window_Loaded"
         Closed="Window_Closed">
     <Grid Background="Black">
@@ -16,7 +16,7 @@
             <Grid Width="1920" Height="1080">
                 <Image Name="camera" Stretch="Uniform" />
                 <Canvas Name="canvas">
-                    <Controls:KinectViewer x:Name="kinectViewer" Visibility="Collapsed"/>
+                    <Controls:KinectViewer x:Name="kinectViewer" Visibility="Visible" Visualization="Depth"/>
                 </Canvas>
             </Grid>
         </Viewbox>
