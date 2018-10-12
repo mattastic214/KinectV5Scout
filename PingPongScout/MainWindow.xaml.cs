@@ -32,12 +32,15 @@ namespace PingPongScout
         private KinectSensor _kinectSensor = null;
         private MultiSourceFrameReader _multiSourceFrameReader = null;
         private CoordinateMapper _coordinateMapper = null;
+
         private BallDetectionEngine _ballDetectionEngine = null;
         private Body _body = null;
         private IList<Body> _bodyData = null;
+
         private WriteableBitmap _bitmap = null;
         private InfraredBitmapGenerator _infraredBitmapGenerator = null;
         private DepthBitmapGenerator _depthBitmapGenerator = null;
+
         private ushort[] _depthData = null;
         private ushort[] _infraredData = null;
         private ushort[] _longExposureData = null;
@@ -62,8 +65,28 @@ namespace PingPongScout
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        #endregion
 
 
+        #region EventHandlers
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            if (_multiSourceFrameReader != null)
+            {
+                _multiSourceFrameReader.Dispose();
+            }
+
+            if (_kinectSensor != null)
+            {
+                _kinectSensor.Close();                 
+            }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
             _kinectSensor = KinectSensor.GetDefault();
 
             if (_kinectSensor != null)
@@ -81,23 +104,6 @@ namespace PingPongScout
             }
         }
 
-        #endregion
-
-        #region EventHandlers
-
-        public void WindowClosing(object sender, CancelEventArgs e)
-        {
-            if (_multiSourceFrameReader != null)
-            {
-                _multiSourceFrameReader.Dispose();
-            }
-
-            if (_kinectSensor != null)
-            {
-                _kinectSensor.Close();                 
-            }
-        }
-
         private void MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
         {
             MultiSourceFrame frame = e.FrameReference.AcquireFrame();
@@ -105,7 +111,8 @@ namespace PingPongScout
             if (frame != null )
             {
 
-                // Async 1
+                // Async 1: Used for Joint detection and projection to the screen.
+                // COORDINATE MAPPING
                 using (var bodyFrame = frame.BodyFrameReference.AcquireFrame())
                 {
                     // Placeholder for refactoring.
@@ -115,18 +122,19 @@ namespace PingPongScout
                     {
                         bodyFrame.GetAndRefreshBodyData(_bodyData);
 
-                        var bodyIEnum = _bodyData.Where(b => b.IsTracked);
-                        var otVitBodies = bodyIEnum.Select(b => BodyWrapper.Create(b, _coordinateMapper, Visualization.Infrared));                        
+                        //var bodyIEnum = _bodyData.Where(b => b.IsTracked);
+                        //var otVitBodies = bodyIEnum.Select(b => BodyWrapper.Create(b, _coordinateMapper, Visualization.Infrared));
+                        var sumOtVitBodies = _bodyData.Where(b => b.IsTracked)
+                                                .Select(b => BodyWrapper.Create(b, _coordinateMapper, Visualization.Infrared));
                         // Ok, you have the bodies you want. What do you want to do with them now?
 
-                        foreach(BodyWrapper bodyWrapper in otVitBodies)
+                        foreach(BodyWrapper bodyWrapper in sumOtVitBodies)
                         {
                             if(bodyWrapper.IsTracked)
                             {
                                 Console.WriteLine("Got bodyWrapper.");
-                                var joints = bodyWrapper.Joints;
-
-                                var jointsAll = joints.Values;
+                                
+                                var jointsAll = bodyWrapper.Joints.Values;
 
                                 var trackedJoints = jointsAll.Where(j => j.TrackingState != TrackingState.NotTracked);
                                 
@@ -141,32 +149,90 @@ namespace PingPongScout
                 }
 
 
-                // Async 2
+                // Async 2 The Green Screen. Cancel out the Table Tennis table?
+                using (var bodyFrame = frame.BodyFrameReference.AcquireFrame())
                 using (var bodyIndexFrame = frame.BodyIndexFrameReference.AcquireFrame())
                 using (var depthFrame = frame.DepthFrameReference.AcquireFrame())
                 {
                     if (depthFrame != null && bodyIndexFrame != null)
                     {
                         _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
-                        
-                        // Pick one.
-                        _bitmap = depthFrame.ToBitmap(bodyIndexFrame);
-                        var bitmapDepth = depthFrame.ToBitmap(bodyIndexFrame);
-                        Console.WriteLine("Depth and BodyIndex Present");
+                        _depthData = _depthBitmapGenerator.DepthData;
+                        _bodyIndexData = _depthBitmapGenerator.BodyData;
+                        // Add body Data somehow with _bodyData? Does it keep track of 1 - 6 bodies?
+
+                        // Why doesn't this go to the camera? // var alt_bitmap = _depthBitmapGenerator.Bitmap;
+                        _bitmap = _depthBitmapGenerator.HighlightedBitmap;                                                
+                        camera.Source = _bitmap;                // Looks like the Predator?
+                        Console.WriteLine("Depth and BodyIndex _bitmap Present");
                     }
 
+                    if (bodyFrame != null)
+                    {
+                        bodyFrame.GetAndRefreshBodyData(_bodyData);
+
+                        var sumOtVitBodies = _bodyData.Where(b => b.IsTracked)
+                                                .Select(b => BodyWrapper.Create(b, _coordinateMapper, Visualization.Depth));
+
+                        foreach (BodyWrapper bodyWrapper in sumOtVitBodies)
+                        {
+                            if (bodyWrapper.IsTracked)
+                            {
+                                canvas.Children.Clear();
+
+                                // 2D space point
+                                Point point = new Point();
+
+                                var jointsAll = bodyWrapper.Joints.Values;
+
+                                var trackedJoints = jointsAll.Where(j => j.TrackingState != TrackingState.NotTracked);
+
+                                var cameraSpaceJoints = trackedJoints.ToArray();
+                                CameraSpacePoint[] jointCameraPoints = cameraSpaceJoints.Select(j => j.Position).ToArray();
+
+                                //DepthSpacePoint[] jointDepthPoints;
+                                //_kinectSensor.CoordinateMapper.MapCameraPointsToDepthSpace(jointCamPoints, );
+
+                                // Using Infrared, not depth hmmmm....
+                                foreach (Joint joint in trackedJoints)
+                                {
+                                    DepthSpacePoint depthPoint = _kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(joint.Position);
+
+                                    // point.X = DepthSpacePoint    // It's a Struct.
+                                    point.X = float.IsInfinity(depthPoint.X) ? 0 : depthPoint.X;
+                                    point.Y = float.IsInfinity(depthPoint.Y) ? 0 : depthPoint.Y;
+
+                                    // Draw
+                                    Ellipse ellipse = new Ellipse
+                                    {
+                                        Fill = Brushes.Red,
+                                        Width = 20,
+                                        Height = 20
+                                    };
+
+                                    Canvas.SetLeft(ellipse, point.X - ellipse.Width / 2);
+                                    Canvas.SetTop(ellipse, point.Y - ellipse.Height / 2);
+
+                                    canvas.Children.Add(ellipse);
+                                }
+                            }
+                        }
+                    }
                 }
-                
+
                 // Async 3
                 using (var infraredFrame = frame.InfraredFrameReference.AcquireFrame())
                 {
                     // A job for Async?
 
                     if (infraredFrame != null)
-                    {
-                        Console.WriteLine("Infrared Present");
+                    {                        
                         _infraredBitmapGenerator.Update(infraredFrame);
-                        var bitmapInfrared = infraredFrame.ToBitmap();
+                        _infraredData = _infraredBitmapGenerator.InfraredData;
+
+                        _bitmap = _infraredBitmapGenerator.Bitmap;
+                        // camera.Source = _bitmap;             // Looks like night vision.
+                        Console.WriteLine("Infrared Present");
                     }                    
                 }
 
@@ -224,5 +290,11 @@ namespace PingPongScout
             _ballDetectionEngine = new BallDetectionEngine(_coordinateMapper, depthWidth, depthHeight);
             _ballDetectionEngine.BallDetected += BallDetectEvent;
         }
+
+
+        //private void Window_Loaded(object sender, RoutedEventArgs e)
+        //{
+
+        //}
     }
 }
