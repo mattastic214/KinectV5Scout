@@ -4,7 +4,6 @@ using Microsoft.Kinect;
 using LightBuzz.Vitruvius;
 using LightBuzz.Vitruvius.Controls;
 using System.Linq;
-using KinectConstantsBGRA;
 using System.Numerics;
 using System.ComponentModel;
 using BallDetection;
@@ -61,6 +60,47 @@ namespace PingPongScout
 
         #endregion
 
+        #region Delegate Definitions
+
+        private void OpenKinect()
+        {
+            _kinectSensor.Open();
+            _coordinateMapper = _kinectSensor.CoordinateMapper;
+            _kinectViewer = new KinectViewer();
+            _kinectViewer.InitializeComponent();
+            _kinectViewer.Visualization = Visualization.Depth;
+        }
+
+        private void InitializeMultiSourceReader()
+        {
+            _multiSourceFrameReader = _kinectSensor
+                    .OpenMultiSourceFrameReader(FrameSourceTypes.Body | FrameSourceTypes.BodyIndex | FrameSourceTypes.Depth | FrameSourceTypes.Infrared | FrameSourceTypes.LongExposureInfrared);
+
+            _multiSourceFrameReader.MultiSourceFrameArrived += MultiSourceFrameArrived;
+        }
+
+        private void InitializeBitmap(int depthWidth, int depthHeight)
+        {
+            _bitmap = new WriteableBitmap(depthWidth, depthHeight, 96.0, 96.0, PixelFormats.Bgr32, null);
+            camera.Source = _bitmap;
+
+            _infraredBitmapGenerator = new InfraredBitmapGenerator();
+            _depthBitmapGenerator = new DepthBitmapGenerator();
+        }
+
+        private void InitializeFrameData(int depthWidth, int depthHeight)
+        {
+            int depthArea = depthWidth * depthHeight;
+
+            _bodyData = new Body[_kinectSensor.BodyFrameSource.BodyCount];
+            _infraredData = new ushort[depthArea];
+            _depthData = new ushort[depthArea];
+            _bodyIndexData = new byte[depthArea];
+            _longExposureData = new ushort[depthArea];
+        }
+
+        #endregion
+
         #region Constructor
 
         public MainWindow()
@@ -108,18 +148,20 @@ namespace PingPongScout
         private void MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
         {
             MultiSourceFrame frame = e.FrameReference.AcquireFrame();
-            
+
+            // COORDINATE MAPPING
             if (frame != null )
             {
-                
-                // COORDINATE MAPPING
+
+                // Monitor 1:
+                // Async 1
+                // Async 2
                 using (var bodyFrame = frame.BodyFrameReference.AcquireFrame())
                 using (var bodyIndexFrame = frame.BodyIndexFrameReference.AcquireFrame())
                 using (var depthFrame = frame.DepthFrameReference.AcquireFrame())
                 {
                     // Use new CameraSpacePoint and ToPoint, to map to 2D space.
-
-                    // Monitor 1:
+                    
                     // Async 1 The Green Screen. Cancel out the Table Tennis table?
                     if (depthFrame != null && bodyIndexFrame != null)
                     {
@@ -133,8 +175,8 @@ namespace PingPongScout
                         camera.Source = _bitmap;                // Looks like the Predator?
                         // camera.Source = depthFrame.ToBitmap();
                         // camera.Source = DepthExtensions.ToBitmap(depthFrame);
-                        
-                        Console.WriteLine("Depth and BodyIndex _bitmap Present");
+
+
                     }
 
                     // Async 2: Used for Joint detection and projection to the screen.
@@ -150,7 +192,7 @@ namespace PingPongScout
 
                         // Ok, you have the bodies you want. What do you want to do with them now?
 
-                        // Thread 1?
+                        // Thread 1? for Infrared Bodies, only projecting to depth for now!
                         foreach (BodyWrapper bodyWrapper in sumIrBodies)     // There can only be 4 in our case. 6 is most Kinect supports. It's ok.
                         {
                             if (bodyWrapper.IsTracked)
@@ -162,31 +204,32 @@ namespace PingPongScout
 
                                 foreach (Joint joint in trackedJoints)
                                 {
-                                    Console.WriteLine("Position of " + joint.JointType.ToString() + ": X=" + joint.Position.X + " Y=" + joint.Position.Y + " Z=" + joint.Position.Z);
+                                    // Console.WriteLine("Position of " + joint.JointType.ToString() + ": X=" + joint.Position.X + " Y=" + joint.Position.Y + " Z=" + joint.Position.Z);
                                 }
                             }
                         }
 
-                        // Thread 2?
+                        // Thread 2 ? For Depth and Bodies, only projecting to depth for now!
                         foreach (BodyWrapper bodyWrapper in sumDepthBodies)     // There can only be 4 in our case. 6 is most Kinect supports. It's ok.
                         {
                             if (bodyWrapper.IsTracked)
                             {
                                 canvas.Children.Clear();
 
-                                // 2D space point
-                                Point point = new Point();
 
                                 var jointsAll = bodyWrapper.Joints.Values;
                                 var trackedJoints = jointsAll.Where(j => j.TrackingState != TrackingState.NotTracked);
-                                
+
                                 foreach (Joint joint in trackedJoints)
                                 {
-                                    DepthSpacePoint depthPoint = _kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(joint.Position);
+                                    // Use new CameraSpacePoint and ToPoint, to map to 2D space.
+                                    // DepthSpacePoint depthPoint = _kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(joint.Position);
 
-                                    // point.X = DepthSpacePoint    // It's a Struct.
-                                    point.X = float.IsInfinity(depthPoint.X) ? 0 : depthPoint.X;
-                                    point.Y = float.IsInfinity(depthPoint.Y) ? 0 : depthPoint.Y;
+                                    CameraSpacePoint cameraPoint = joint.Position;      // cameraPoints = 3D coordinates
+
+                                    DepthSpacePoint depthPoint = _kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(cameraPoint);        // depthPoints = 2D coordinates
+
+
 
                                     // Draw
                                     Ellipse ellipse = new Ellipse
@@ -196,13 +239,15 @@ namespace PingPongScout
                                         Height = 20
                                     };
 
-                                    Canvas.SetLeft(ellipse, point.X - ellipse.Width);
-                                    Canvas.SetTop(ellipse, point.Y - ellipse.Height);
+                                    Console.WriteLine("Position of " + joint.JointType.ToString() + ": X=" + joint.Position.X + " Y=" + joint.Position.Y + " Z=" + joint.Position.Z);
+                                    Canvas.SetLeft(ellipse, (depthPoint.X - ellipse.Width));
+                                    Canvas.SetTop(ellipse, (depthPoint.Y - ellipse.Width));
 
                                     canvas.Children.Add(ellipse);
                                 }
                             }
                         }
+
                     }
                 }
 
@@ -230,51 +275,15 @@ namespace PingPongScout
                         
                 }                               
             }
-
         }
 
         #endregion
 
+        #region Ball Detection
+
         private void BallDetectEvent(object sender, BallDetectionResult e)
         {
 
-        }
-
-        private void OpenKinect()
-        {
-            _kinectSensor.Open();
-            _coordinateMapper = _kinectSensor.CoordinateMapper;
-            _kinectViewer = new KinectViewer();
-            _kinectViewer.InitializeComponent();
-            _kinectViewer.Visualization = Visualization.Depth;
-        }
-
-        private void InitializeMultiSourceReader()
-        {
-            _multiSourceFrameReader = _kinectSensor
-                    .OpenMultiSourceFrameReader(FrameSourceTypes.Body | FrameSourceTypes.BodyIndex | FrameSourceTypes.Depth | FrameSourceTypes.Infrared | FrameSourceTypes.LongExposureInfrared);
-
-            _multiSourceFrameReader.MultiSourceFrameArrived += MultiSourceFrameArrived;
-        }
-
-        private void InitializeBitmap(int depthWidth, int depthHeight)
-        {
-            _bitmap = new WriteableBitmap(depthWidth, depthHeight, 96.0, 96.0, PixelFormats.Bgr32, null);
-            camera.Source = _bitmap;
-
-            _infraredBitmapGenerator = new InfraredBitmapGenerator();
-            _depthBitmapGenerator = new DepthBitmapGenerator();
-        }
-
-        private void InitializeFrameData(int depthWidth, int depthHeight)
-        {
-            int depthArea = depthWidth * depthHeight;
-
-            _bodyData = new Body[_kinectSensor.BodyFrameSource.BodyCount];
-            _infraredData = new ushort[depthArea];
-            _depthData = new ushort[depthArea];
-            _bodyIndexData = new byte[depthArea];
-            _longExposureData = new ushort[depthArea];
         }
 
         private void InitializeBallDetection(int depthWidth, int depthHeight)
@@ -283,6 +292,6 @@ namespace PingPongScout
             _ballDetectionEngine.BallDetected += BallDetectEvent;
         }
 
-
+        #endregion
     }
 }

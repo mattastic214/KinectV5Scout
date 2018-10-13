@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlayerDetection", "PlayerDe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectConstantsBGRA", "KinectConstantsBGRA\KinectConstantsBGRA.csproj", "{ADB994E7-CE6B-4670-8609-4C38730613DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectionInterface", "ProjectionInterface\ProjectionInterface.csproj", "{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,14 @@ Global
 		{ADB994E7-CE6B-4670-8609-4C38730613DF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ADB994E7-CE6B-4670-8609-4C38730613DF}.Release|x64.ActiveCfg = Release|Any CPU
 		{ADB994E7-CE6B-4670-8609-4C38730613DF}.Release|x64.Build.0 = Release|Any CPU
+		{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}.Debug|x64.Build.0 = Debug|Any CPU
+		{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}.Release|x64.ActiveCfg = Release|Any CPU
+		{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
