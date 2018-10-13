@@ -2,18 +2,10 @@
 using System.Windows;
 using Microsoft.Kinect;
 using LightBuzz.Vitruvius;
-using LightBuzz.Vitruvius.Controls;
+using LightBuzz.Vitruvius.Controls;     // Use for KinectViewer. What does it do?
 using System.Linq;
-
-
-
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -22,32 +14,30 @@ namespace PingPongScout
 {
     /// <summary>
     /// Interaction logic for WindowInfrared.xaml
+    /// InfraredFrame
     /// Tracks joints of body.
-    /// Detects image and location of ball. (Yet to be implemented)
+    /// Detects image and location of ball. (Yet to be implemented) [Too much for one class? Determine distance from Ball to Player Hand? hmmm...]
     /// </summary>
     public partial class WindowInfrared : Window
     {
 
         #region Members
 
-        private List<Ellipse> _points = new List<Ellipse>();
+        private List<Ellipse> _points = new List<Ellipse>();        // Use this instead of new upping Points?
 
         private KinectSensor _kinectSensor = null;
-        private KinectViewer _kinectViewer = null;
+        //private KinectViewer _kinectViewer = null;
         private MultiSourceFrameReader _multiSourceFrameReader = null;
         private CoordinateMapper _coordinateMapper = null;
 
-        private Body _body = null;
+        private Body _body = null;              // Use this if the body is tracked, right?
         private IList<Body> _bodyData = null;
 
         private WriteableBitmap _bitmap = null;
         private InfraredBitmapGenerator _infraredBitmapGenerator = null;
-        private DepthBitmapGenerator _depthBitmapGenerator = null;
 
         private ushort[] _depthData = null;
         private ushort[] _infraredData = null;
-        private ushort[] _longExposureData = null;
-        private byte[] _bodyIndexData = null;
 
         #endregion
 
@@ -68,15 +58,12 @@ namespace PingPongScout
         {
             _kinectSensor.Open();
             _coordinateMapper = _kinectSensor.CoordinateMapper;
-            _kinectViewer = new KinectViewer();
-            _kinectViewer.InitializeComponent();
-            _kinectViewer.Visualization = Visualization.Depth;
         }
 
         private void InitializeMultiSourceReader()
         {
             _multiSourceFrameReader = _kinectSensor
-                    .OpenMultiSourceFrameReader(FrameSourceTypes.Body | FrameSourceTypes.Depth | FrameSourceTypes.Infrared);
+                    .OpenMultiSourceFrameReader(FrameSourceTypes.Body | FrameSourceTypes.Infrared);
 
             _multiSourceFrameReader.MultiSourceFrameArrived += MultiSourceFrameArrived;
         }
@@ -87,7 +74,6 @@ namespace PingPongScout
             camera.Source = _bitmap;
 
             _infraredBitmapGenerator = new InfraredBitmapGenerator();
-            _depthBitmapGenerator = new DepthBitmapGenerator();
         }
 
         private void InitializeFrameData(int depthWidth, int depthHeight)
@@ -97,8 +83,6 @@ namespace PingPongScout
             _bodyData = new Body[_kinectSensor.BodyFrameSource.BodyCount];
             _infraredData = new ushort[depthArea];
             _depthData = new ushort[depthArea];
-            _bodyIndexData = new byte[depthArea];
-            _longExposureData = new ushort[depthArea];
         }
 
         #endregion
@@ -148,25 +132,21 @@ namespace PingPongScout
             // COORDINATE MAPPING
             if (reference != null)
             {
-
-                // Async 1
-                // Async 2
                 using (var infraredFrame = reference.InfraredFrameReference.AcquireFrame())
                 using (var bodyFrame = reference.BodyFrameReference.AcquireFrame())
                 {
 
                     if (infraredFrame != null)
                     {
+                        _infraredBitmapGenerator.Update(infraredFrame);                        
 
-                        _infraredBitmapGenerator.Update(infraredFrame);
                         _infraredData = _infraredBitmapGenerator.InfraredData;
-
-                        _bitmap = _infraredBitmapGenerator.Bitmap;
-                        camera.Source = _bitmap;             // Looks like night vision.                        
+                        camera.Source = _infraredBitmapGenerator.Bitmap;             // Looks like night vision.                        
                     }
 
                     if (bodyFrame != null)
                     {
+                        canvas.Children.Clear();
                         bodyFrame.GetAndRefreshBodyData(_bodyData);
 
                         var trackedBodies = _bodyData.Where(b => b.IsTracked)
@@ -175,27 +155,25 @@ namespace PingPongScout
                         foreach (BodyWrapper bodyWrapper in trackedBodies)     // There can only be 4 in our case. 6 is most Kinect supports. It's ok.
                         {
                             if (bodyWrapper.IsTracked)
-                            {
-                                canvas.Children.Clear();
-
+                            {                                
                                 var trackedJoints = bodyWrapper.TrackedJoints(false);
 
                                 foreach (Joint joint in trackedJoints)
                                 {
                                     DepthSpacePoint depthPoint = _kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(joint.Position);
 
-                                    Ellipse ellipse = new Ellipse
+                                    Ellipse ellipse = new Ellipse       // Use List of Ellipses here!
                                     {
                                         Fill = Brushes.Red,
-                                        Width = 20,
-                                        Height = 20
+                                        Width = 10,
+                                        Height = 10
                                     };
 
-                                    Canvas.SetLeft(ellipse, (depthPoint.X - ellipse.Width / 2));
+                                    Canvas.SetLeft(ellipse, (depthPoint.X - ellipse.Width / 2)); // Use a forech on the ellipse List with this
                                     Canvas.SetTop(ellipse, (depthPoint.Y - ellipse.Width / 2));
 
                                     canvas.Children.Add(ellipse);
-                                }
+                                }                                
                             }
                         }
                     }

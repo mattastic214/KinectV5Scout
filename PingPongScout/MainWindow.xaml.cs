@@ -2,7 +2,7 @@
 using System.Windows;
 using Microsoft.Kinect;
 using LightBuzz.Vitruvius;
-using LightBuzz.Vitruvius.Controls;
+using LightBuzz.Vitruvius.Controls; // Use for KinectViewer. What does it do?
 using KinectConstantsBGRA;
 
 namespace PingPongScout
@@ -18,7 +18,7 @@ namespace PingPongScout
         #region Members
 
         private KinectSensor _kinectSensor = null;
-        private KinectViewer _kinectViewer = null;                  // What use is this??
+        //private KinectViewer _kinectViewer = null;                  // What use is this??
         private MultiSourceFrameReader _multiSourceFrameReader = null;
         private CoordinateMapper _coordinateMapper = null;
 
@@ -44,9 +44,6 @@ namespace PingPongScout
         {
             _kinectSensor.Open();
             _coordinateMapper = _kinectSensor.CoordinateMapper;
-            _kinectViewer = new KinectViewer();
-            _kinectViewer.InitializeComponent();
-            _kinectViewer.Visualization = Visualization.Depth;
         }
 
         private void InitializeMultiSourceReader()

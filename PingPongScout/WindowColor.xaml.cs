@@ -4,15 +4,8 @@ using Microsoft.Kinect;
 using LightBuzz.Vitruvius;
 using LightBuzz.Vitruvius.Controls;
 using System.Linq;
-
-
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -23,21 +16,20 @@ namespace PingPongScout
     /// Interaction logic for WindowColor.xaml
     /// Tracks joints of body.
     /// Color camera view, provides feedback to user.
-    /// Eliminate a camera type altogether? Decide...
     /// </summary>
     public partial class WindowColor : Window
     {
 
         #region Members
 
-        private List<Ellipse> _points = new List<Ellipse>();
+        private List<Ellipse> _points = new List<Ellipse>();        // Use this instead of new upping Points?
 
         private KinectSensor _kinectSensor = null;
         private KinectViewer _kinectViewer = null;
         private MultiSourceFrameReader _multiSourceFrameReader = null;
         private CoordinateMapper _coordinateMapper = null;
 
-        private Body _body = null;
+        private Body _body = null;                  // Use this if the body is tracked, right?
         private IList<Body> _bodyData = null;
 
         private WriteableBitmap _bitmap = null;
