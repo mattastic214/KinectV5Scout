@@ -4,27 +4,30 @@ using Microsoft.Kinect;
 using LightBuzz.Vitruvius;
 using LightBuzz.Vitruvius.Controls;
 using System.Linq;
-using KinectConstantsBGRA;
-using System.Numerics;
-using System.ComponentModel;
 
-using System.Windows.Shapes;
+
+
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Collections.Generic;
-using Emgu.CV;
-using System.Runtime.InteropServices;
+using System.Windows.Shapes;
 
 namespace PingPongScout
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// Gets the highlighted BodyIndexFrame; cancels out table blocking the view of the body.
+    /// Interaction logic for WindowInfrared.xaml
+    /// Tracks joints of body.
+    /// Detects image and location of ball. (Yet to be implemented)
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class WindowInfrared : Window
     {
-        
+
         #region Members
 
         private List<Ellipse> _points = new List<Ellipse>();
@@ -56,11 +59,10 @@ namespace PingPongScout
         delegate void initializeFrameDataDelegate(int depthWidth, int depthHeight);
 
         private delegate void generateBodyDataDelegate();
-        private generateBodyDataDelegate generateBodyData;
 
         #endregion
 
-        #region Initialization and OpenKinect Definitions
+        #region Delegate Definitions
 
         private void OpenKinect()
         {
@@ -74,7 +76,7 @@ namespace PingPongScout
         private void InitializeMultiSourceReader()
         {
             _multiSourceFrameReader = _kinectSensor
-                    .OpenMultiSourceFrameReader(FrameSourceTypes.Body | FrameSourceTypes.BodyIndex | FrameSourceTypes.Depth | FrameSourceTypes.Infrared | FrameSourceTypes.LongExposureInfrared);
+                    .OpenMultiSourceFrameReader(FrameSourceTypes.Body | FrameSourceTypes.Depth | FrameSourceTypes.Infrared);
 
             _multiSourceFrameReader.MultiSourceFrameArrived += MultiSourceFrameArrived;
         }
@@ -101,7 +103,7 @@ namespace PingPongScout
 
         #endregion
 
-        public MainWindow()
+        public WindowInfrared()
         {
             InitializeComponent();
         }
@@ -117,7 +119,7 @@ namespace PingPongScout
 
             if (_kinectSensor != null)
             {
-                _kinectSensor.Close();                 
+                _kinectSensor.Close();
             }
         }
 
@@ -144,29 +146,58 @@ namespace PingPongScout
             MultiSourceFrame reference = e.FrameReference.AcquireFrame();
 
             // COORDINATE MAPPING
-            if (reference != null )
+            if (reference != null)
             {
 
-                // Monitor 1:
                 // Async 1
                 // Async 2
+                using (var infraredFrame = reference.InfraredFrameReference.AcquireFrame())
                 using (var bodyFrame = reference.BodyFrameReference.AcquireFrame())
-                using (var bodyIndexFrame = reference.BodyIndexFrameReference.AcquireFrame())
-                using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
                 {
-                    
-                    // Async 1 The Green Screen. Dose it cancel out the Table Tennis table?
-                    // Generates highlited bodyIndex frame and displays to camera.Source
-                    if (depthFrame != null && bodyIndexFrame != null)
+
+                    if (infraredFrame != null)
                     {
-                        _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
 
-                        _depthData = _depthBitmapGenerator.DepthData;
-                        _bodyIndexData = _depthBitmapGenerator.BodyData;
-                        _bitmap = _depthBitmapGenerator.HighlightedBitmap;
-                        // Add body Data somehow with _bodyData? Does it keep track of 1 - 6 bodies?
+                        _infraredBitmapGenerator.Update(infraredFrame);
+                        _infraredData = _infraredBitmapGenerator.InfraredData;
 
-                        camera.Source = DepthExtensions.ToBitmap(depthFrame, bodyIndexFrame);       // Looks like the Predator.
+                        _bitmap = _infraredBitmapGenerator.Bitmap;
+                        camera.Source = _bitmap;             // Looks like night vision.                        
+                    }
+
+                    if (bodyFrame != null)
+                    {
+                        bodyFrame.GetAndRefreshBodyData(_bodyData);
+
+                        var trackedBodies = _bodyData.Where(b => b.IsTracked)
+                                                    .Select(b => BodyWrapper.Create(b, _coordinateMapper, Visualization.Depth));
+
+                        foreach (BodyWrapper bodyWrapper in trackedBodies)     // There can only be 4 in our case. 6 is most Kinect supports. It's ok.
+                        {
+                            if (bodyWrapper.IsTracked)
+                            {
+                                canvas.Children.Clear();
+
+                                var trackedJoints = bodyWrapper.TrackedJoints(false);
+
+                                foreach (Joint joint in trackedJoints)
+                                {
+                                    DepthSpacePoint depthPoint = _kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(joint.Position);
+
+                                    Ellipse ellipse = new Ellipse
+                                    {
+                                        Fill = Brushes.Red,
+                                        Width = 20,
+                                        Height = 20
+                                    };
+
+                                    Canvas.SetLeft(ellipse, (depthPoint.X - ellipse.Width / 2));
+                                    Canvas.SetTop(ellipse, (depthPoint.Y - ellipse.Width / 2));
+
+                                    canvas.Children.Add(ellipse);
+                                }
+                            }
+                        }
                     }
                 }
             }

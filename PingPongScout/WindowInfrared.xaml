@@ -1,4 +1,4 @@
-﻿<Window x:Class="PingPongScout.MainWindow"
+﻿<Window x:Class="PingPongScout.WindowInfrared"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:PingPongScout"
         xmlns:Controls="clr-namespace:LightBuzz.Vitruvius.Controls;assembly=LightBuzz.Vitruvius.Controls"
         mc:Ignorable="d"
-        Title="Ping Pong | KINECT Depth" 
-        Width="1200" Height="800"
+        Title="Ping Pong | KINECT Infrared" 
+        Width="1200" Height="800" 
         WindowState="Maximized"
         Loaded="Window_Loaded"
         Closed="Window_Closed">
@@ -16,7 +16,6 @@
             <Grid Width="512" Height="424">
                 <Image Name="camera" Stretch="Uniform" />
                 <Canvas Name="canvas">
-                    <Controls:KinectViewer x:Name="kinectViewer" Visibility="Visible" Visualization="Depth"/>
                 </Canvas>
             </Grid>
         </Viewbox>
