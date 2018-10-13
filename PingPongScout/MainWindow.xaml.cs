@@ -8,7 +8,6 @@ using System.Numerics;
 using System.ComponentModel;
 using BallDetection;
 
-// Below is from WeightLift Sample:
 using System.Windows.Shapes;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -111,50 +110,15 @@ namespace PingPongScout
             
             if (frame != null )
             {
-
-                // Async 1: Used for Joint detection and projection to the screen.
+                
                 // COORDINATE MAPPING
-                using (var bodyFrame = frame.BodyFrameReference.AcquireFrame())
-                {
-                    // Placeholder for refactoring.
-                    // Handle all logic in another method. Functional Programming?
-
-                    if (bodyFrame != null)
-                    {
-                        bodyFrame.GetAndRefreshBodyData(_bodyData);
-
-                        //var bodyIEnum = _bodyData.Where(b => b.IsTracked);
-                        //var otVitBodies = bodyIEnum.Select(b => BodyWrapper.Create(b, _coordinateMapper, Visualization.Infrared));
-                        var sumOtVitBodies = _bodyData.Where(b => b.IsTracked)
-                                                .Select(b => BodyWrapper.Create(b, _coordinateMapper, Visualization.Infrared));
-                        // Ok, you have the bodies you want. What do you want to do with them now?
-
-                        foreach(BodyWrapper bodyWrapper in sumOtVitBodies)
-                        {
-                            if(bodyWrapper.IsTracked)
-                            {
-                                Console.WriteLine("Got bodyWrapper.");
-                                
-                                var jointsAll = bodyWrapper.Joints.Values;
-
-                                var trackedJoints = jointsAll.Where(j => j.TrackingState != TrackingState.NotTracked);
-                                
-                                // Using Infrared, not depth hmmmm....
-                                foreach(Joint joint in trackedJoints)
-                                {
-                                    Console.WriteLine("Position of " + joint.JointType.ToString() + ": X=" + joint.Position.X + " Y=" + joint.Position.Y + " Z=" + joint.Position.Z);
-                                }
-                            }                            
-                        }
-                    }
-                }
-
-
-                // Async 2 The Green Screen. Cancel out the Table Tennis table?
                 using (var bodyFrame = frame.BodyFrameReference.AcquireFrame())
                 using (var bodyIndexFrame = frame.BodyIndexFrameReference.AcquireFrame())
                 using (var depthFrame = frame.DepthFrameReference.AcquireFrame())
                 {
+
+                    // Monitor 1:
+                    // Async 1 The Green Screen. Cancel out the Table Tennis table?
                     if (depthFrame != null && bodyIndexFrame != null)
                     {
                         _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
@@ -163,38 +127,54 @@ namespace PingPongScout
                         // Add body Data somehow with _bodyData? Does it keep track of 1 - 6 bodies?
 
                         // Why doesn't this go to the camera? // var alt_bitmap = _depthBitmapGenerator.Bitmap;
-                        _bitmap = _depthBitmapGenerator.HighlightedBitmap;                                                
+                        _bitmap = _depthBitmapGenerator.HighlightedBitmap;
                         camera.Source = _bitmap;                // Looks like the Predator?
                         Console.WriteLine("Depth and BodyIndex _bitmap Present");
                     }
 
+                    // Async 2: Used for Joint detection and projection to the screen.
                     if (bodyFrame != null)
                     {
                         bodyFrame.GetAndRefreshBodyData(_bodyData);
 
-                        var sumOtVitBodies = _bodyData.Where(b => b.IsTracked)
+                        var sumIrBodies = _bodyData.Where(b => b.IsTracked)
+                                                .Select(b => BodyWrapper.Create(b, _coordinateMapper, Visualization.Infrared));
+
+                        var sumDepthBodies = _bodyData.Where(b => b.IsTracked)
                                                 .Select(b => BodyWrapper.Create(b, _coordinateMapper, Visualization.Depth));
 
-                        foreach (BodyWrapper bodyWrapper in sumOtVitBodies)
+                        // Ok, you have the bodies you want. What do you want to do with them now?
+
+                        // Thread 1?
+                        foreach (BodyWrapper bodyWrapper in sumIrBodies)     // There can only be 4 in our case. 6 is most Kinect supports. It's ok.
                         {
                             if (bodyWrapper.IsTracked)
                             {
-                                canvas.Children.Clear();
-                                
-                                // 2D space point
-                                Point point = new Point();
 
                                 var jointsAll = bodyWrapper.Joints.Values;
 
                                 var trackedJoints = jointsAll.Where(j => j.TrackingState != TrackingState.NotTracked);
 
-                                var cameraSpaceJoints = trackedJoints.ToArray();
-                                CameraSpacePoint[] jointCameraPoints = cameraSpaceJoints.Select(j => j.Position).ToArray();
+                                foreach (Joint joint in trackedJoints)
+                                {
+                                    Console.WriteLine("Position of " + joint.JointType.ToString() + ": X=" + joint.Position.X + " Y=" + joint.Position.Y + " Z=" + joint.Position.Z);
+                                }
+                            }
+                        }
 
-                                //DepthSpacePoint[] jointDepthPoints;
-                                //_kinectSensor.CoordinateMapper.MapCameraPointsToDepthSpace(jointCamPoints, );
+                        // Thread 2?
+                        foreach (BodyWrapper bodyWrapper in sumDepthBodies)     // There can only be 4 in our case. 6 is most Kinect supports. It's ok.
+                        {
+                            if (bodyWrapper.IsTracked)
+                            {
+                                canvas.Children.Clear();
 
-                                // Using Infrared, not depth hmmmm....
+                                // 2D space point
+                                Point point = new Point();
+
+                                var jointsAll = bodyWrapper.Joints.Values;
+                                var trackedJoints = jointsAll.Where(j => j.TrackingState != TrackingState.NotTracked);
+                                
                                 foreach (Joint joint in trackedJoints)
                                 {
                                     DepthSpacePoint depthPoint = _kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(joint.Position);
@@ -221,10 +201,11 @@ namespace PingPongScout
                     }
                 }
 
+                // Monitor 2:
                 // Async 3
+                // Image detection of ball
                 using (var infraredFrame = frame.InfraredFrameReference.AcquireFrame())
                 {
-                    // A job for Async?
 
                     if (infraredFrame != null)
                     {                        
@@ -238,6 +219,7 @@ namespace PingPongScout
                 }
 
                 // Async 4
+                // Reference Vitruvius hand draw.
                 using (var longExposureFrame = frame.LongExposureInfraredFrameReference.AcquireFrame())
                 {
                         
@@ -266,6 +248,7 @@ namespace PingPongScout
         {
             _multiSourceFrameReader = _kinectSensor
                     .OpenMultiSourceFrameReader(FrameSourceTypes.Body | FrameSourceTypes.BodyIndex | FrameSourceTypes.Depth | FrameSourceTypes.Infrared | FrameSourceTypes.LongExposureInfrared);
+
             _multiSourceFrameReader.MultiSourceFrameArrived += MultiSourceFrameArrived;
         }
 
@@ -296,9 +279,5 @@ namespace PingPongScout
         }
 
 
-        //private void Window_Loaded(object sender, RoutedEventArgs e)
-        //{
-
-        //}
     }
 }
