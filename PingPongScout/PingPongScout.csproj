@@ -133,6 +133,10 @@
       <Project>{61f9e6e2-f26c-46ea-88bf-da4a76d2d150}</Project>
       <Name>BallDetection</Name>
     </ProjectReference>
+    <ProjectReference Include="..\KinectConstantsBGRA\KinectConstantsBGRA.csproj">
+      <Project>{adb994e7-ce6b-4670-8609-4c38730613df}</Project>
+      <Name>KinectConstantsBGRA</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

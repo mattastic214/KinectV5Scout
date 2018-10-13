@@ -4,6 +4,7 @@ using Microsoft.Kinect;
 using LightBuzz.Vitruvius;
 using LightBuzz.Vitruvius.Controls;
 using System.Linq;
+using KinectConstantsBGRA;
 using System.Numerics;
 using System.ComponentModel;
 using BallDetection;
@@ -55,7 +56,7 @@ namespace PingPongScout
 
         delegate void initializeFrameDataDelegate(int depthWidth, int depthHeight);
 
-        delegate void generateBodyDataDelegate();
+        private delegate void generateBodyDataDelegate();
         private generateBodyDataDelegate generateBodyData;
 
         #endregion
@@ -116,6 +117,7 @@ namespace PingPongScout
                 using (var bodyIndexFrame = frame.BodyIndexFrameReference.AcquireFrame())
                 using (var depthFrame = frame.DepthFrameReference.AcquireFrame())
                 {
+                    // Use new CameraSpacePoint and ToPoint, to map to 2D space.
 
                     // Monitor 1:
                     // Async 1 The Green Screen. Cancel out the Table Tennis table?
@@ -129,6 +131,9 @@ namespace PingPongScout
                         // Why doesn't this go to the camera? // var alt_bitmap = _depthBitmapGenerator.Bitmap;
                         _bitmap = _depthBitmapGenerator.HighlightedBitmap;
                         camera.Source = _bitmap;                // Looks like the Predator?
+                        // camera.Source = depthFrame.ToBitmap();
+                        // camera.Source = DepthExtensions.ToBitmap(depthFrame);
+                        
                         Console.WriteLine("Depth and BodyIndex _bitmap Present");
                     }
 
