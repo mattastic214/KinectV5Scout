@@ -129,6 +129,8 @@ namespace PingPongScout
                         _depthData = _depthBitmapGenerator.DepthData;
                         _bodyIndexData = _depthBitmapGenerator.BodyData;
 
+                        // camera.Source should take the ProjectionInterface result as an argument.
+                        // can set any of the running analyzers to be the camera Source.
                         camera.Source = DepthExtensions.ToBitmap(depthFrame, bodyIndexFrame);       // Looks like the Predator. Not needed Modularized version refactor.
 
                         Console.WriteLine("Depth data: " + _depthData.Length);
