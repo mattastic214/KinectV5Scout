@@ -130,6 +130,9 @@ namespace PingPongScout
                         _bodyIndexData = _depthBitmapGenerator.BodyData;
 
                         camera.Source = DepthExtensions.ToBitmap(depthFrame, bodyIndexFrame);       // Looks like the Predator. Not needed Modularized version refactor.
+
+                        Console.WriteLine("Depth data: " + _depthData.Length);
+                        Console.WriteLine("BodyFrameIndex data: " + _bodyIndexData.Length);
                     }
                 }
             }

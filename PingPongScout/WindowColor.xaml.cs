@@ -125,12 +125,13 @@ namespace PingPongScout
                         Console.WriteLine("Color available body:");
                         Console.WriteLine("Tracking ID: " + bodyWrapper.TrackingId);
                         Console.WriteLine("Upper Height: " + bodyWrapper.UpperHeight());
+                        Console.WriteLine("BodyWrapper Color JSON: " + bodyWrapper.ToJSON());
                         // BodyLean, HandConfidence, etc.
                     }
                     // Ok, stash the _bodyData somewhere to File I/O to work with it later. Yay!
 
                     // Foreach 2: Draw Joint to canvas
-                    foreach (BodyWrapper bodyWrapper in trackedBodies)     // There can only be 4 in our case. 6 is most Kinect supports. It's ok.
+                    foreach (BodyWrapper bodyWrapper in trackedBodies)
                     {
                         if (bodyWrapper.IsTracked)
                         {
@@ -151,7 +152,7 @@ namespace PingPongScout
                                 Canvas.SetLeft(ellipse, (colorPoint.X - ellipse.Width / 2));
                                 Canvas.SetTop(ellipse, (colorPoint.Y - ellipse.Width / 2));
 
-                                canvas.Children.Add(ellipse);
+                                canvas.Children.Add(ellipse);                                   // Not needed Modularized version refactor.
                             }
                         }
                     }

@@ -131,7 +131,7 @@ namespace PingPongScout
                         _infraredBitmapGenerator.Update(infraredFrame);                        
 
                         _infraredData = _infraredBitmapGenerator.InfraredData;
-                        camera.Source = _infraredBitmapGenerator.Bitmap;             // Looks like night vision.                        
+                        camera.Source = _infraredBitmapGenerator.Bitmap;             // Looks like night vision. Not needed Modularized version refactor.
                     }
 
                     if (bodyFrame != null)
@@ -148,12 +148,14 @@ namespace PingPongScout
                             Console.WriteLine("Infrared available body:");
                             Console.WriteLine("Tracking ID: " + bodyWrapper.TrackingId);
                             Console.WriteLine("Upper Height: " + bodyWrapper.UpperHeight());
+                            Console.WriteLine("BodyWrapper Infrared JSON: " + bodyWrapper.ToJSON());
+                            Console.WriteLine("Infrared Data: " + _infraredData.ToString());
                             // BodyLean, HandConfidence, etc.
                         }
                         // Ok, stash the _bodyData somewhere to File I/O to work with it later. Yay!
 
                         // Foreach 2: Draw Joint to canvas
-                        foreach (BodyWrapper bodyWrapper in trackedBodies)     // There can only be 4 in our case. 6 is most Kinect supports. It's ok.
+                        foreach (BodyWrapper bodyWrapper in trackedBodies)
                         {
                             if (bodyWrapper.IsTracked)
                             {                                                                
@@ -163,17 +165,17 @@ namespace PingPongScout
                                 {
                                     DepthSpacePoint depthPoint = _kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(joint.Position);
 
-                                    Ellipse ellipse = new Ellipse       // Use List of Ellipses here!
+                                    Ellipse ellipse = new Ellipse
                                     {
                                         Fill = Brushes.Red,
                                         Width = 10,
                                         Height = 10
                                     };
 
-                                    Canvas.SetLeft(ellipse, (depthPoint.X - ellipse.Width / 2)); // Use a forech on the ellipse List with this
+                                    Canvas.SetLeft(ellipse, (depthPoint.X - ellipse.Width / 2));
                                     Canvas.SetTop(ellipse, (depthPoint.Y - ellipse.Width / 2));                                                                      
 
-                                    canvas.Children.Add(ellipse);
+                                    canvas.Children.Add(ellipse);           // Not needed Modularized version refactor.
                                 }
                             }
                         }
