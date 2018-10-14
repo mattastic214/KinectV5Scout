@@ -15,28 +15,25 @@ namespace PingPongScout
     /// <summary>
     /// Interaction logic for WindowInfrared.xaml
     /// InfraredFrame
+    /// BodyFrame
+    /// Visualization is set to Infrared 512x424
     /// Tracks joints of body.
-    /// Detects image and location of ball. (Yet to be implemented) [Too much for one class? Determine distance from Ball to Player Hand? hmmm...]
+    /// Detects image and location of ball. (Yet to be implemented) [Too much for one class? Determine distance from Ball to Player Hand? hmmm...] Back to MultiSourceFrameReader...
     /// </summary>
     public partial class WindowInfrared : Window
     {
 
         #region Members
 
-        private List<Ellipse> _points = new List<Ellipse>();        // Use this instead of new upping Points?
+        //private List<Ellipse> _points = new List<Ellipse>();        // Use this instead of new upping Points?
 
         private KinectSensor _kinectSensor = null;
         //private KinectViewer _kinectViewer = null;
         private MultiSourceFrameReader _multiSourceFrameReader = null;
         private CoordinateMapper _coordinateMapper = null;
-
-        private Body _body = null;              // Use this if the body is tracked, right?
-        private IList<Body> _bodyData = null;
-
-        private WriteableBitmap _bitmap = null;
         private InfraredBitmapGenerator _infraredBitmapGenerator = null;
 
-        private ushort[] _depthData = null;
+        private IList<Body> _bodyData = null;
         private ushort[] _infraredData = null;
 
         #endregion
@@ -46,13 +43,9 @@ namespace PingPongScout
         delegate void constructorOperationDelegate();
         private constructorOperationDelegate constructorOperation;
 
-        delegate void initializeFrameDataDelegate(int depthWidth, int depthHeight);
-
-        private delegate void generateBodyDataDelegate();
-
         #endregion
 
-        #region Delegate Definitions
+        #region Initialization and OpenKinect Definitions
 
         private void OpenKinect()
         {
@@ -70,10 +63,8 @@ namespace PingPongScout
 
         private void InitializeBitmap(int depthWidth, int depthHeight)
         {
-            _bitmap = new WriteableBitmap(depthWidth, depthHeight, 96.0, 96.0, PixelFormats.Bgr32, null);
-            camera.Source = _bitmap;
-
             _infraredBitmapGenerator = new InfraredBitmapGenerator();
+            camera.Source = new WriteableBitmap(depthWidth, depthHeight, 96.0, 96.0, PixelFormats.Bgr32, null);          
         }
 
         private void InitializeFrameData(int depthWidth, int depthHeight)
@@ -82,7 +73,6 @@ namespace PingPongScout
 
             _bodyData = new Body[_kinectSensor.BodyFrameSource.BodyCount];
             _infraredData = new ushort[depthArea];
-            _depthData = new ushort[depthArea];
         }
 
         #endregion
@@ -150,12 +140,23 @@ namespace PingPongScout
                         bodyFrame.GetAndRefreshBodyData(_bodyData);
 
                         var trackedBodies = _bodyData.Where(b => b.IsTracked)
-                                                    .Select(b => BodyWrapper.Create(b, _coordinateMapper, Visualization.Depth));
+                                                    .Select(b => BodyWrapper.Create(b, _coordinateMapper, Visualization.Infrared));
 
+                        // Foreach 1: File IO. Body data also Being done in WindowColor, move somewhere else.
+                        foreach (BodyWrapper bodyWrapper in trackedBodies)
+                        {
+                            Console.WriteLine("Infrared available body:");
+                            Console.WriteLine("Tracking ID: " + bodyWrapper.TrackingId);
+                            Console.WriteLine("Upper Height: " + bodyWrapper.UpperHeight());
+                            // BodyLean, HandConfidence, etc.
+                        }
+                        // Ok, stash the _bodyData somewhere to File I/O to work with it later. Yay!
+
+                        // Foreach 2: Draw Joint to canvas
                         foreach (BodyWrapper bodyWrapper in trackedBodies)     // There can only be 4 in our case. 6 is most Kinect supports. It's ok.
                         {
                             if (bodyWrapper.IsTracked)
-                            {                                
+                            {                                                                
                                 var trackedJoints = bodyWrapper.TrackedJoints(false);
 
                                 foreach (Joint joint in trackedJoints)
@@ -170,10 +171,10 @@ namespace PingPongScout
                                     };
 
                                     Canvas.SetLeft(ellipse, (depthPoint.X - ellipse.Width / 2)); // Use a forech on the ellipse List with this
-                                    Canvas.SetTop(ellipse, (depthPoint.Y - ellipse.Width / 2));
+                                    Canvas.SetTop(ellipse, (depthPoint.Y - ellipse.Width / 2));                                                                      
 
                                     canvas.Children.Add(ellipse);
-                                }                                
+                                }
                             }
                         }
                     }

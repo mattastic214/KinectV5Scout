@@ -10,6 +10,7 @@ namespace PingPongScout
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// DepthFrame
+    /// BodyIndexFrame
     /// Gets the highlighted BodyIndexFrame; cancels out table blocking the view of the body.
     /// </summary>
     public partial class MainWindow : Window
@@ -49,7 +50,7 @@ namespace PingPongScout
         private void InitializeMultiSourceReader()
         {
             _multiSourceFrameReader = _kinectSensor
-                    .OpenMultiSourceFrameReader(FrameSourceTypes.Body | FrameSourceTypes.BodyIndex | FrameSourceTypes.Depth);
+                    .OpenMultiSourceFrameReader(FrameSourceTypes.BodyIndex | FrameSourceTypes.Depth);
 
             _multiSourceFrameReader.MultiSourceFrameArrived += MultiSourceFrameArrived;
         }
@@ -128,7 +129,7 @@ namespace PingPongScout
                         _depthData = _depthBitmapGenerator.DepthData;
                         _bodyIndexData = _depthBitmapGenerator.BodyData;
 
-                        camera.Source = DepthExtensions.ToBitmap(depthFrame, bodyIndexFrame);       // Looks like the Predator.
+                        camera.Source = DepthExtensions.ToBitmap(depthFrame, bodyIndexFrame);       // Looks like the Predator. Not needed Modularized version refactor.
                     }
                 }
             }
