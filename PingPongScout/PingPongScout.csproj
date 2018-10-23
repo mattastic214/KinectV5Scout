@@ -56,10 +56,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Emgu.CV.UI">
-      <HintPath>..\..\..\libraries\emgucv-windesktop 3.4.1.2976\bin\Emgu.CV.UI.dll</HintPath>
+      <HintPath>..\..\..\assemblies\emgucv-windesktop 3.4.1.2976\bin\Emgu.CV.UI.dll</HintPath>
     </Reference>
     <Reference Include="Emgu.CV.World">
-      <HintPath>..\..\..\libraries\emgucv-windesktop 3.4.1.2976\bin\Emgu.CV.World.dll</HintPath>
+      <HintPath>..\..\..\assemblies\emgucv-windesktop 3.4.1.2976\bin\Emgu.CV.World.dll</HintPath>
     </Reference>
     <Reference Include="LightBuzz.Vitruvius">
       <HintPath>..\..\..\..\libraries\Vitruvius_(Premium)\LightBuzz.Vitruvius.5.0.1\LightBuzz.Vitruvius.4.5.0-Legacy\Assemblies\WPF\LightBuzz.Vitruvius.dll</HintPath>
