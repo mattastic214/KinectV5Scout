@@ -10,6 +10,6 @@ namespace KinectFrameController
 {
     interface IFrameController
     {
-        IEnumerable GetFrameData();        
+        void GetFrameData(IDictionary frameDictionary);        
     }
 }

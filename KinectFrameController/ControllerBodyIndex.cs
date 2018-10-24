@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace KinectFrameController
 {
-    class BodyIndexController : IFrameController
+    class ControllerBodyIndex : IFrameController
     {
         public IEnumerable GetFrameData()
         {

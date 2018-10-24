@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace KinectFrameController
 {
-    public class DepthDataController : IFrameController
+    public class ControllerDepthData : IFrameController
     {
-        public IEnumerable GetFrameData()
+        public void GetFrameData(IDictionary frameDictionary)
         {
             throw new NotImplementedException();
         }

@@ -41,11 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BodyIndexController.cs" />
-    <Compile Include="BodyVitruviusController.cs" />
-    <Compile Include="DepthDataController.cs" />
+    <Compile Include="ControllerBodyIndex.cs" />
+    <Compile Include="ControllerBodyVitruvius.cs" />
+    <Compile Include="ControllerDepthData.cs" />
     <Compile Include="IFrameController.cs" />
-    <Compile Include="InfraredDataController.cs" />
+    <Compile Include="ControllerInfraredData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
