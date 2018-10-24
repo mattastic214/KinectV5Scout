@@ -44,7 +44,7 @@
     <Compile Include="BodyIndexController.cs" />
     <Compile Include="BodyVitruviusController.cs" />
     <Compile Include="DepthDataController.cs" />
-    <Compile Include="IDataController.cs" />
+    <Compile Include="IFrameController.cs" />
     <Compile Include="InfraredDataController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
