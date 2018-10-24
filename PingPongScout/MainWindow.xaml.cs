@@ -142,8 +142,8 @@ namespace PingPongScout
 
                         // Insert depthData controller here.
                         // Insert bodyIndex controller here.
-                        Console.WriteLine("Depth data: " + _depthData.Length);
-                        Console.WriteLine("BodyFrameIndex data: " + _bodyIndexData.Length);
+                        Console.WriteLine("\nDepth data (ushort): " + _depthData + ", Length " + _depthData.Length + ", var 2: " + _depthData[2]);
+                        Console.WriteLine("BodyFrameIndex data (byte): " + _bodyIndexData + ", Length " + _bodyIndexData.Length + ", var 5: " + _bodyIndexData[5] + "\n");
                     }
                 }
 
@@ -155,7 +155,7 @@ namespace PingPongScout
 
                         _infraredData = _infraredBitmapGenerator.InfraredData;
                         // Insert infraredData controller here.
-                        Console.WriteLine("Infrared data: " + _infraredData.Length);
+                        Console.WriteLine("\nInfrared data (ushort): " + _infraredData + ", Length " + _infraredData.Length + ", var 25: " + _infraredData[25]);
                     }                    
                 }
 
@@ -172,11 +172,14 @@ namespace PingPongScout
                         foreach (BodyWrapper bodyWrapper in trackedBodies)
                         {
                             // Insert bodyWrapper Controller here.
-                            Console.WriteLine("Infrared available body:");
+                            // It's a JSON, so it's easy to work with.
+                            Console.WriteLine("\nInfrared body available:");
                             Console.WriteLine("Tracking ID: " + bodyWrapper.TrackingId);
                             Console.WriteLine("Upper Height: " + bodyWrapper.UpperHeight());
                             Console.WriteLine("BodyWrapper Infrared JSON: " + bodyWrapper.ToJSON());
-                            Console.WriteLine("Infrared Data: " + _infraredData.ToString());
+                            Console.WriteLine("BodyWrapper: " + bodyWrapper.ToJSON().GetBytes());
+                            Console.WriteLine("JSON Length: " + bodyWrapper.ToJSON().GetBytes().Length);
+                            Console.WriteLine("Infrared Data: " + _infraredData + "\n");
                             // BodyLean, HandConfidence, etc.
                         }
                     }
