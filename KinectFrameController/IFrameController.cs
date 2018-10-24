@@ -8,8 +8,13 @@ using System.Threading.Tasks;
 
 namespace KinectFrameController
 {
+    //interface IFrameController
+    //{
+    //    void GetFrameData(ReadOnlyDictionary<Enum, IStructuralComparable> frameDictionary);        
+    //}
+
     interface IFrameController
     {
-        void GetFrameData(ReadOnlyDictionary<Enum, IStructuralComparable> frameDictionary);        
+        void GetFrameData(object[] arrayData);
     }
 }

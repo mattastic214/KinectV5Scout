@@ -13,7 +13,7 @@ namespace KinectFrameController
     {
         private ServiceInfraredData service = null;
 
-        public void GetFrameData(ReadOnlyDictionary<Enum, IStructuralComparable> frameDictionary)
+        public void GetFrameData(object[] arrayData)
         {
             throw new NotImplementedException();
         }
