@@ -10,6 +10,6 @@ namespace KinectFrameController
 {
     interface IFrameController
     {
-        void GetFrameData(IDictionary frameDictionary);        
+        void GetFrameData(ReadOnlyDictionary<Enum, IStructuralComparable> frameDictionary);        
     }
 }

@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7EE05804-E99A-4122-8121-84BF49031F5C}</ProjectGuid>
+    <ProjectGuid>{102DB8CE-52EA-4E16-ADAB-B4C57669A78E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>KinectFrameController</RootNamespace>
-    <AssemblyName>KinectFrameController</AssemblyName>
+    <RootNamespace>KinectFrameService</RootNamespace>
+    <AssemblyName>KinectFrameService</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -41,18 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ControllerBodyIndex.cs" />
-    <Compile Include="ControllerBodyVitruvius.cs" />
-    <Compile Include="ControllerDepthData.cs" />
-    <Compile Include="IFrameController.cs" />
-    <Compile Include="ControllerInfraredData.cs" />
+    <Compile Include="ServiceInfraredData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\KinectFrameService\KinectFrameService.csproj">
-      <Project>{102db8ce-52ea-4e16-adab-b4c57669a78e}</Project>
-      <Name>KinectFrameService</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

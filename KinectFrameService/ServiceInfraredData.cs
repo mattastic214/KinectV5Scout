@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KinectCameraController
+namespace KinectFrameService
 {
-    public class InfraredCameraController
+    public class ServiceInfraredData
     {
     }
 }
