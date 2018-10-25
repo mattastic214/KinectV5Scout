@@ -158,6 +158,10 @@
       <Project>{adb994e7-ce6b-4670-8609-4c38730613df}</Project>
       <Name>KinectConstantsBGRA</Name>
     </ProjectReference>
+    <ProjectReference Include="..\KinectFrameController\KinectFrameController.csproj">
+      <Project>{7ee05804-e99a-4122-8121-84bf49031f5c}</Project>
+      <Name>KinectFrameController</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

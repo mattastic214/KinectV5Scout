@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using Microsoft.Kinect;
 using LightBuzz.Vitruvius;
 using LightBuzz.Vitruvius.Controls; // Use for KinectViewer. What does it do?
-using KinectConstantsBGRA;
 using System.Linq;
+using KinectFrameController;
+
 
 namespace PingPongScout
 {
@@ -22,6 +23,10 @@ namespace PingPongScout
 
         private KinectSensor _kinectSensor = null;
         //private KinectViewer _kinectViewer = null;                  // What use is this??
+        private DepthController depthController = new DepthController();
+        private BodyIndexController bodyIndexController = new BodyIndexController();
+        private VitruviusBodyController vitruviusBodyController = new VitruviusBodyController();
+        private InfraredController infraredController = new InfraredController();
         private MultiSourceFrameReader _multiSourceFrameReader = null;
         private CoordinateMapper _coordinateMapper = null;
         private InfraredBitmapGenerator _infraredBitmapGenerator = null;
@@ -140,10 +145,8 @@ namespace PingPongScout
                         _depthData = _depthBitmapGenerator.DepthData;
                         _bodyIndexData = _depthBitmapGenerator.BodyData;
 
-                        // Insert depthData controller here.
-                        // Insert bodyIndex controller here.
-                        Console.WriteLine("\nDepth data (ushort): " + _depthData + ", Length " + _depthData.Length + ", var 2: " + _depthData[2]);
-                        Console.WriteLine("BodyFrameIndex data (byte): " + _bodyIndexData + ", Length " + _bodyIndexData.Length + ", var 5: " + _bodyIndexData[5] + "\n");
+                        depthController.GetFrameData(_depthData);
+                        bodyIndexController.GetFrameData(_bodyIndexData);
                     }
                 }
 
@@ -152,10 +155,9 @@ namespace PingPongScout
                     if (infraredFrame != null)
                     {
                         _infraredBitmapGenerator.Update(infraredFrame);
-
                         _infraredData = _infraredBitmapGenerator.InfraredData;
-                        // Insert infraredData controller here.
-                        Console.WriteLine("\nInfrared data (ushort): " + _infraredData + ", Length " + _infraredData.Length + ", var 25: " + _infraredData[25]);
+                        
+                        infraredController.GetFrameData(_infraredData);                        
                     }                    
                 }
 
@@ -171,16 +173,7 @@ namespace PingPongScout
                         // Foreach 1: File IO. Body data also Being done in WindowColor, move somewhere else.
                         foreach (BodyWrapper bodyWrapper in trackedBodies)
                         {
-                            // Insert bodyWrapper Controller here.
-                            // It's a JSON, so it's easy to work with.
-                            Console.WriteLine("\nInfrared body available:");
-                            Console.WriteLine("Tracking ID: " + bodyWrapper.TrackingId);
-                            Console.WriteLine("Upper Height: " + bodyWrapper.UpperHeight());
-                            Console.WriteLine("BodyWrapper Infrared JSON: " + bodyWrapper.ToJSON());
-                            Console.WriteLine("BodyWrapper: " + bodyWrapper.ToJSON().GetBytes());
-                            Console.WriteLine("JSON Length: " + bodyWrapper.ToJSON().GetBytes().Length);
-                            Console.WriteLine("Infrared Data: " + _infraredData + "\n");
-                            // BodyLean, HandConfidence, etc.
+                            vitruviusBodyController.GetFrameData(bodyWrapper);                            
                         }
                     }
                 }

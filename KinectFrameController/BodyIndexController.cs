@@ -9,13 +9,13 @@ using KinectFrameService;
 
 namespace KinectFrameController
 {
-    class ControllerBodyIndex : IFrameController
+    public class BodyIndexController
     {
         private ServiceInfraredData service = null;
 
-        public void GetFrameData(ReadOnlyDictionary<Enum, IStructuralComparable> frameDictionary)
+        public void GetFrameData(byte[] bodyIndexData)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("BodyFrameIndex data (byte): " + bodyIndexData + ", Length " + bodyIndexData.Length + ", var 5: " + bodyIndexData[5] + "\n");
         }
     }
 }

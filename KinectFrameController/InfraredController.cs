@@ -9,13 +9,13 @@ using KinectFrameService;
 
 namespace KinectFrameController
 {
-    class ControllerBodyVitruvius : IFrameController
+    public class InfraredController
     {
         private ServiceInfraredData service = null;
 
-        public void GetFrameData(object[] arrayData)
+        public void GetFrameData(ushort[] infraredData)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("\nInfrared data (ushort): " + infraredData + ", Length " + infraredData.Length + ", var 25: " + infraredData[25]);
         }
     }
 }

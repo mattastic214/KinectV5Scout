@@ -9,13 +9,13 @@ using KinectFrameService;
 
 namespace KinectFrameController
 {
-    class ControllerInfraredData : IFrameController
+    public class DepthController
     {
         private ServiceInfraredData service = null;
 
-        public void GetFrameData(object[] arrayData)
+        public void GetFrameData(ushort[] depthData)
         {
-            throw new NotImplementedException();
+            Console.WriteLine("\nDepth data (ushort): " + depthData + ", Length " + depthData.Length + ", var 2: " + depthData[2]);
         }
     }
 }
