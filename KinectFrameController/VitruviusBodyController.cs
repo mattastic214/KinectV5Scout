@@ -16,7 +16,7 @@ namespace KinectFrameController
         private ServiceInfraredData service = null;
 
         public void GetFrameData(BodyWrapper bodyWrapper)
-        {
+        {                   
             // It's a JSON, so it's easy to work with.
             Console.WriteLine("\nInfrared body available:");
             Console.WriteLine("Tracking ID: " + bodyWrapper.TrackingId);
@@ -24,7 +24,7 @@ namespace KinectFrameController
             Console.WriteLine("BodyWrapper Infrared JSON: " + bodyWrapper.ToJSON());
             Console.WriteLine("BodyWrapper: " + bodyWrapper.ToJSON().GetBytes());
             Console.WriteLine("JSON Length: " + bodyWrapper.ToJSON().GetBytes().Length);
-            // BodyLean, HandConfidence, etc.
+            // BodyLean, HandConfidence, etc.s         
         }
     }
 }

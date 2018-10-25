@@ -15,7 +15,7 @@ namespace KinectFrameController
 
         public void GetFrameData(byte[] bodyIndexData)
         {
-            Console.WriteLine("BodyFrameIndex data (byte): " + bodyIndexData + ", Length " + bodyIndexData.Length + ", var 5: " + bodyIndexData[5] + "\n");
+            Console.WriteLine("BodyFrameIndex data (byte): " + bodyIndexData + ", Length " + bodyIndexData.Length + ", var 5: " + bodyIndexData[5] + "\n");            
         }
     }
 }

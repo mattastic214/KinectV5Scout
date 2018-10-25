@@ -3,6 +3,7 @@ using System.Windows;
 using System.Collections.Generic;
 using Microsoft.Kinect;
 using LightBuzz.Vitruvius;
+using System.Threading.Tasks;
 using LightBuzz.Vitruvius.Controls; // Use for KinectViewer. What does it do?
 using System.Linq;
 using KinectFrameController;
@@ -151,14 +152,23 @@ namespace PingPongScout
                 }
 
                 using (var infraredFrame = reference.InfraredFrameReference.AcquireFrame())
+                using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
                 {
                     if (infraredFrame != null)
                     {
                         _infraredBitmapGenerator.Update(infraredFrame);
                         _infraredData = _infraredBitmapGenerator.InfraredData;
-                        
-                        infraredController.GetFrameData(_infraredData);                        
-                    }                    
+
+                        infraredController.GetFrameData(_infraredData);
+                    }
+
+                    if (depthFrame != null)
+                    {
+                        _depthBitmapGenerator.Update(depthFrame);
+                        _depthData = _depthBitmapGenerator.DepthData;
+
+                        depthController.GetFrameData(_depthData);
+                    }
                 }
 
                 using (var bodyFrame = reference.BodyFrameReference.AcquireFrame())

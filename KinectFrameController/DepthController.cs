@@ -15,7 +15,7 @@ namespace KinectFrameController
 
         public void GetFrameData(ushort[] depthData)
         {
-            Console.WriteLine("\nDepth data (ushort): " + depthData + ", Length " + depthData.Length + ", var 2: " + depthData[2]);
+            Console.WriteLine("\nDepth data (ushort): " + depthData + ", Length " + depthData.Length + ", var 2: " + depthData[2]);            
         }
     }
 }
