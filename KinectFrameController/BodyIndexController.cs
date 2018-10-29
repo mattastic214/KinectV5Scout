@@ -15,8 +15,11 @@ namespace KinectFrameController
 
         public static void GetFrameData(KeyValuePair<TimeSpan, byte[]> bodyIndexData)
         {
-            Console.WriteLine("BodyFrameIndex data (byte): " + bodyIndexData + ", Value: " + bodyIndexData.Value);
-            BodyIndexDataBase.WriteToDataBase(bodyIndexData);
+            if(!bodyIndexData.Key.Equals(null) && !bodyIndexData.Value.Equals(null))
+            {
+                Console.WriteLine("BodyFrameIndex data (byte): " + bodyIndexData + ", Value: " + bodyIndexData.Value);
+                BodyIndexDataBase.WriteToDataBase(bodyIndexData);
+            }            
         }
 
         public static void GetFrameData(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData)

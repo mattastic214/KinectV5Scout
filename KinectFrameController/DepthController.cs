@@ -14,8 +14,12 @@ namespace KinectFrameController
 
         public static void GetFrameData(KeyValuePair<TimeSpan, ushort[]> depthData)
         {
-            Console.WriteLine("\nDepth data (ushort): " + depthData + ", Value: " + depthData.Value);
-            DepthDataBase.WriteToDataBase(depthData);
+            if (!depthData.Key.Equals(null) && !depthData.Value.Equals(null))
+            {
+                Console.WriteLine("\nDepth data (ushort): " + depthData + ", Value: " + depthData.Value);
+                DepthDataBase.WriteToDataBase(depthData);
+            }
+            
         }
     }
 }
