@@ -24,15 +24,11 @@ namespace PingPongScout
 
         private KinectSensor _kinectSensor = null;
         //private KinectViewer _kinectViewer = null;                  // What use is this??
-        private DepthController depthController = new DepthController();
-        private BodyIndexController bodyIndexController = new BodyIndexController();
-        private VitruviusBodyController vitruviusBodyController = new VitruviusBodyController();
-        private InfraredController infraredController = new InfraredController();
         private MultiSourceFrameReader _multiSourceFrameReader = null;
         private CoordinateMapper _coordinateMapper = null;
+
+
         private InfraredBitmapGenerator _infraredBitmapGenerator = null;
-
-
         private DepthBitmapGenerator _depthBitmapGenerator = null;
 
         private IList<Body> _bodyData = null;
@@ -127,12 +123,12 @@ namespace PingPongScout
         {
             MultiSourceFrame reference = e.FrameReference.AcquireFrame();
 
-
             // Edit: Switch to routing with controllers (that have hidden implementation details).
             // COORDINATE MAPPING
             if (reference != null )
             {
-
+                TimeSpan timeStamp;
+                // Some kind of tracking 1.
                 using (var bodyIndexFrame = reference.BodyIndexFrameReference.AcquireFrame())
                 using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
                 {
@@ -143,47 +139,56 @@ namespace PingPongScout
                     {
                         _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
 
+                        timeStamp = depthFrame.RelativeTime;
+
                         _depthData = _depthBitmapGenerator.DepthData;
                         _bodyIndexData = _depthBitmapGenerator.BodyData;
 
-                        depthController.GetFrameData(_depthData);
-                        bodyIndexController.GetFrameData(_bodyIndexData);
+                        DepthController.GetFrameData(new KeyValuePair<TimeSpan, ushort[]>(timeStamp, _depthData));
+                        BodyIndexController.GetFrameData(new KeyValuePair<TimeSpan, byte[]>(timeStamp, _bodyIndexData));                        
                     }
                 }
 
+                // Some kind of tracking 2.
                 using (var infraredFrame = reference.InfraredFrameReference.AcquireFrame())
                 using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
                 {
+                    
                     if (infraredFrame != null)
                     {
+                        timeStamp = infraredFrame.RelativeTime;
+                        
                         _infraredBitmapGenerator.Update(infraredFrame);
                         _infraredData = _infraredBitmapGenerator.InfraredData;
 
-                        infraredController.GetFrameData(_infraredData);
+                        InfraredController.GetFrameData(new KeyValuePair<TimeSpan, ushort[]>(timeStamp, _infraredData));
                     }
 
                     if (depthFrame != null)
                     {
+                        timeStamp = depthFrame.RelativeTime;
                         _depthBitmapGenerator.Update(depthFrame);
                         _depthData = _depthBitmapGenerator.DepthData;
 
-                        depthController.GetFrameData(_depthData);
+                        DepthController.GetFrameData(new KeyValuePair<TimeSpan, ushort[]>(timeStamp, _depthData));
                     }
                 }
 
+                // Some kind of tracking 3.
                 using (var bodyFrame = reference.BodyFrameReference.AcquireFrame())
                 {
                     if (bodyFrame != null)
                     {
                         bodyFrame.GetAndRefreshBodyData(_bodyData);
+                        timeStamp = bodyFrame.RelativeTime;
 
                         var trackedBodies = _bodyData.Where(b => b.IsTracked)
-                                                    .Select(b => BodyWrapper.Create(b, _coordinateMapper, Visualization.Infrared));
+                                                    .Select(b => new KeyValuePair<TimeSpan, BodyWrapper>(timeStamp, BodyWrapper
+                                                    .Create(b, _coordinateMapper, Visualization.Infrared)) );
 
-                        // Foreach 1: File IO. Body data also Being done in WindowColor, move somewhere else.
-                        foreach (BodyWrapper bodyWrapper in trackedBodies)
+                        foreach (KeyValuePair<TimeSpan, BodyWrapper> kvp in trackedBodies)
                         {
-                            vitruviusBodyController.GetFrameData(bodyWrapper);                            
+                            VitruviusBodyController.GetFrameData(kvp);
                         }
                     }
                 }

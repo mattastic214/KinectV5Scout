@@ -5,17 +5,16 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using KinectFrameService;
+using KinectDataBase;
 
 namespace KinectFrameController
 {
     public class InfraredController
     {
-        private ServiceInfraredData service = null;
-
-        public void GetFrameData(ushort[] infraredData)
+        public static void GetFrameData(KeyValuePair<TimeSpan, ushort[]> infraredData)
         {
-            Console.WriteLine("\nInfrared data (ushort): " + infraredData + ", Length " + infraredData.Length + ", var 25: " + infraredData[25]);
+            Console.WriteLine("\nInfrared data (ushort): " + infraredData + ", Value: " + infraredData.Value);
+            InfraredDataBase.WriteToDataBase(infraredData);
         }
     }
 }

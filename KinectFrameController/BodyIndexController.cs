@@ -5,17 +5,23 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using KinectFrameService;
+using LightBuzz.Vitruvius;
+using KinectDataBase;
 
 namespace KinectFrameController
 {
     public class BodyIndexController
     {
-        private ServiceInfraredData service = null;
 
-        public void GetFrameData(byte[] bodyIndexData)
+        public static void GetFrameData(KeyValuePair<TimeSpan, byte[]> bodyIndexData)
         {
-            Console.WriteLine("BodyFrameIndex data (byte): " + bodyIndexData + ", Length " + bodyIndexData.Length + ", var 5: " + bodyIndexData[5] + "\n");            
+            Console.WriteLine("BodyFrameIndex data (byte): " + bodyIndexData + ", Value: " + bodyIndexData.Value);
+            BodyIndexDataBase.WriteToDataBase(bodyIndexData);
+        }
+
+        public static void GetFrameData(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData)
+        {
+            Console.WriteLine("BodyFrameIndex data (byte): " + bodyIndexData + ", Value: " + bodyIndexData.Value);
         }
     }
 }
