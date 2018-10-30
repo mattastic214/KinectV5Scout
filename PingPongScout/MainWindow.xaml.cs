@@ -132,20 +132,14 @@ namespace PingPongScout
                 using (var bodyIndexFrame = reference.BodyIndexFrameReference.AcquireFrame())
                 using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
                 {
-                    
                     // Does it cancel out the Table Tennis table? Yes!
                     // Generates highlited bodyIndex frame and displays to camera.Source;
                     if (depthFrame != null && bodyIndexFrame != null)
                     {
                         _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
-
                         timeStamp = depthFrame.RelativeTime;
 
-                        _depthData = _depthBitmapGenerator.DepthData;
-                        _bodyIndexData = _depthBitmapGenerator.BodyData;
-
-                        DepthController.GetFrameData(new KeyValuePair<TimeSpan, ushort[]>(timeStamp, _depthData));
-                        BodyIndexController.GetFrameData(new KeyValuePair<TimeSpan, byte[]>(timeStamp, _bodyIndexData));                        
+                        BodyIndexController.GetFrameData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));                        
                     }
                 }
 
@@ -153,24 +147,20 @@ namespace PingPongScout
                 using (var infraredFrame = reference.InfraredFrameReference.AcquireFrame())
                 using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
                 {
-                    
                     if (infraredFrame != null)
                     {
                         timeStamp = infraredFrame.RelativeTime;
-                        
-                        _infraredBitmapGenerator.Update(infraredFrame);
-                        _infraredData = _infraredBitmapGenerator.InfraredData;
+                        _infraredBitmapGenerator.Update(infraredFrame);                        
 
-                        InfraredController.GetFrameData(new KeyValuePair<TimeSpan, ushort[]>(timeStamp, _infraredData));
+                        InfraredController.GetFrameData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));
                     }
 
                     if (depthFrame != null)
                     {
                         timeStamp = depthFrame.RelativeTime;
                         _depthBitmapGenerator.Update(depthFrame);
-                        _depthData = _depthBitmapGenerator.DepthData;
 
-                        DepthController.GetFrameData(new KeyValuePair<TimeSpan, ushort[]>(timeStamp, _depthData));
+                        DepthController.GetFrameData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
                     }
                 }
 

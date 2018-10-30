@@ -17,14 +17,20 @@ namespace KinectFrameController
         {
             if(!bodyIndexData.Key.Equals(null) && !bodyIndexData.Value.Equals(null))
             {
-                Console.WriteLine("BodyFrameIndex data (byte): " + bodyIndexData + ", Value: " + bodyIndexData.Value);
+                Random random = new Random();
+                int i = random.Next(0, 255);
+                Console.WriteLine("\n" + i);
+                Console.WriteLine("BodyFrameIndex Depth data (byte): " + bodyIndexData.Key + ", Value: " + bodyIndexData.Value.GetValue(i));
                 BodyIndexDataBase.WriteToDataBase(bodyIndexData);
             }            
         }
 
         public static void GetFrameData(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData)
         {
-            Console.WriteLine("BodyFrameIndex data (byte): " + bodyIndexData + ", Value: " + bodyIndexData.Value);
+            Random random = new Random();
+            int i = random.Next(0, (int)Math.Pow(2, 16) - 1);
+            Console.WriteLine("\n" + i);
+            Console.WriteLine("BodyFrameIndex Depth data (ushort): " + bodyIndexData.Key + ", Value: " + bodyIndexData.Value.DepthData.GetValue(i));
         }
     }
 }

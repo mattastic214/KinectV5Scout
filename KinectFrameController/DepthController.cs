@@ -6,20 +6,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using KinectDataBase;
+using LightBuzz.Vitruvius;
 
 namespace KinectFrameController
 {
     public class DepthController
     {
-
         public static void GetFrameData(KeyValuePair<TimeSpan, ushort[]> depthData)
         {
             if (!depthData.Key.Equals(null) && !depthData.Value.Equals(null))
             {
-                Console.WriteLine("\nDepth data (ushort): " + depthData + ", Value: " + depthData.Value);
+                Random random = new Random();
+                Console.WriteLine("\nDepth data (ushort): " + depthData.Key + ", Value: " + depthData.Value.GetValue(random.Next(0, (int)Math.Pow(2, 16) - 1)));
                 DepthDataBase.WriteToDataBase(depthData);
-            }
-            
+            }            
         }
+
+        public static void GetFrameData(KeyValuePair<TimeSpan, DepthBitmapGenerator> depthData)
+        {
+            Random random = new Random();
+            int i = random.Next(0, (int)Math.Pow(2, 16) - 1);
+            Console.WriteLine("\n" + i);
+            Console.WriteLine("Depth data (ushort): " + depthData.Key + ", Value: " + depthData.Value.DepthData.GetValue(i));
+        }
+
     }
 }
