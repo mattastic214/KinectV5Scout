@@ -7,6 +7,10 @@
 *.userosscache
 *.sln.docstates
 
+# Ignore Vitruvius dll's
+**/LightBuzz.Vitruvius.dll
+**/LightBuzz.Vitruvius.Controls.dll
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
