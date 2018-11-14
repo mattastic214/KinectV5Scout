@@ -1,22 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using LightBuzz.Vitruvius;
 
 namespace KinectDataBase
 {
-    public class DepthDataBase
+    public class DepthDataBase : IDepthController
     {
-        public static void WriteToDataBase(KeyValuePair<TimeSpan, ushort[]> depthData)
+        public void GetFrameData(KeyValuePair<TimeSpan, DepthBitmapGenerator> depthData)
         {
-            string path = @"d:\\OneDrive\\DbText\\DepthData.txt";
-
-            using (FileStream fs = File.Create(path))
-            {
-                byte[] info = new UTF8Encoding(true).GetBytes(depthData.Value.ToString());
-                fs.Write(info, 0, info.Length);
-            }
+            Random random = new Random();
+            int i = random.Next(0, (int)Math.Pow(2, 16) - 1);
+            Console.WriteLine("\n" + i);
+            Console.WriteLine("Depth data (ushort): " + depthData.Key + ", Value: " + depthData.Value.DepthData.GetValue(i));
         }
-
     }
 }

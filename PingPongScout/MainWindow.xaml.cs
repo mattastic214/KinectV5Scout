@@ -6,8 +6,7 @@ using LightBuzz.Vitruvius;
 using System.Threading.Tasks;
 using LightBuzz.Vitruvius.Controls; // Use for KinectViewer. What does it do?
 using System.Linq;
-using KinectFrameController;
-
+using KinectDataBase;
 
 namespace PingPongScout
 {
@@ -22,20 +21,20 @@ namespace PingPongScout
         
         #region Members
 
+        private BodyIndexDataBase BodyIndexDataBase = null;
+        private DepthDataBase DepthDataBase = null;
+        private InfraredDataBase InfraredDataBase = null;
+        private VitruviusDataBase VitruviusDataBase = null;
+
         private KinectSensor _kinectSensor = null;
         //private KinectViewer _kinectViewer = null;                  // What use is this??
         private MultiSourceFrameReader _multiSourceFrameReader = null;
         private CoordinateMapper _coordinateMapper = null;
 
-
         private InfraredBitmapGenerator _infraredBitmapGenerator = null;
         private DepthBitmapGenerator _depthBitmapGenerator = null;
 
         private IList<Body> _bodyData = null;
-        private ushort[] _infraredData = null;
-
-        private ushort[] _depthData = null;
-        private byte[] _bodyIndexData = null;
 
         #endregion
 
@@ -75,8 +74,6 @@ namespace PingPongScout
             int depthArea = depthWidth * depthHeight;
 
             _bodyData = new Body[_kinectSensor.BodyFrameSource.BodyCount];
-            _depthData = new ushort[depthArea];
-            _bodyIndexData = new byte[depthArea];
         }
 
         #endregion
@@ -139,7 +136,7 @@ namespace PingPongScout
                         _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
                         timeStamp = depthFrame.RelativeTime;
 
-                        BodyIndexController.GetFrameData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));                        
+                        BodyIndexDataBase.GetFrameData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));                        
                     }
                 }
 
@@ -152,7 +149,7 @@ namespace PingPongScout
                         timeStamp = infraredFrame.RelativeTime;
                         _infraredBitmapGenerator.Update(infraredFrame);                        
 
-                        InfraredController.GetFrameData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));
+                        InfraredDataBase.GetFrameData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));
                     }
 
                     if (depthFrame != null)
@@ -160,7 +157,7 @@ namespace PingPongScout
                         timeStamp = depthFrame.RelativeTime;
                         _depthBitmapGenerator.Update(depthFrame);
 
-                        DepthController.GetFrameData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
+                        DepthDataBase.GetFrameData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
                     }
                 }
 
@@ -178,7 +175,7 @@ namespace PingPongScout
 
                         foreach (KeyValuePair<TimeSpan, BodyWrapper> kvp in trackedBodies)
                         {
-                            VitruviusBodyController.GetFrameData(kvp);
+                            VitruviusDataBase.GetFrameData(kvp);
                         }
                     }
                 }

@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LightBuzz.Vitruvius;
-using KinectDataBase;
 
 namespace KinectFrameController
 {
@@ -21,7 +20,6 @@ namespace KinectFrameController
                 int i = random.Next(0, 255);
                 Console.WriteLine("\n" + i);
                 Console.WriteLine("BodyFrameIndex Depth data (byte): " + bodyIndexData.Key + ", Value: " + bodyIndexData.Value.GetValue(i));
-                BodyIndexDataBase.WriteToDataBase(bodyIndexData);
             }            
         }
 

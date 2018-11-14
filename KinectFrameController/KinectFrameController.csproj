@@ -45,16 +45,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BodyIndexController.cs" />
+    <Compile Include="IBodyIndexController.cs" />
+    <Compile Include="IDepthController.cs" />
+    <Compile Include="IInfraredController.cs" />
+    <Compile Include="IVitruviusBodyController.cs" />
     <Compile Include="VitruviusBodyController.cs" />
     <Compile Include="DepthController.cs" />
     <Compile Include="InfraredController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\KinectDataBase\KinectDataBase.csproj">
-      <Project>{bbb014e1-06a7-46d4-9b8e-efb9d71478c2}</Project>
-      <Name>KinectDataBase</Name>
-    </ProjectReference>
     <ProjectReference Include="..\KinectFrameService\KinectFrameService.csproj">
       <Project>{102db8ce-52ea-4e16-adab-b4c57669a78e}</Project>
       <Name>KinectFrameService</Name>

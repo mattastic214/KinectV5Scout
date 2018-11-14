@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Kinect;
-using KinectDataBase;
 using LightBuzz.Vitruvius;
 
 namespace KinectFrameController
@@ -17,7 +16,6 @@ namespace KinectFrameController
         {            
             if (!bodyWrapper.Key.Equals(null) && !bodyWrapper.Value.Equals(null))
             {
-                VitruviusDataBase.WriteToDataBase(bodyWrapper);
                 // It's a JSON, so it's easy to work with.
                 Console.WriteLine("\nInfrared body available:");
                 Console.WriteLine("Tracking ID: " + bodyWrapper.Value.TrackingId);

@@ -5,7 +5,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using KinectDataBase;
 using LightBuzz.Vitruvius;
 
 namespace KinectFrameController
@@ -18,7 +17,7 @@ namespace KinectFrameController
             {
                 Random random = new Random();
                 Console.WriteLine("\nDepth data (ushort): " + depthData.Key + ", Value: " + depthData.Value.GetValue(random.Next(0, (int)Math.Pow(2, 16) - 1)));
-                DepthDataBase.WriteToDataBase(depthData);
+               
             }            
         }
 

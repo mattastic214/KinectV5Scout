@@ -1,23 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using LightBuzz.Vitruvius;
 
 namespace KinectDataBase
 {
-    public class VitruviusDataBase
+    public class VitruviusDataBase : IVitruviusBodyController
     {
-        public static void WriteToDataBase(KeyValuePair<TimeSpan, BodyWrapper> vitruviusData)
+        public void GetFrameData(KeyValuePair<TimeSpan, BodyWrapper> bodyWrapper)
         {
-            string path = @"d:\\OneDrive\\DbText\\VitruviusData.txt";
-
-            using (FileStream fs = File.Create(path))
+            if (!bodyWrapper.Key.Equals(null) && !bodyWrapper.Value.Equals(null))
             {
-                byte[] info = new UTF8Encoding(true).GetBytes(vitruviusData.Value.ToString());
-                fs.Write(info, 0, info.Length);
+                // It's a JSON, so it's easy to work with.
+                Console.WriteLine("\nInfrared body available:");
+                Console.WriteLine("Tracking ID: " + bodyWrapper.Value.TrackingId);
+                Console.WriteLine("Upper Height: " + bodyWrapper.Value.UpperHeight());
+                Console.WriteLine("Time stamp:" + bodyWrapper.Key);
+                Console.WriteLine("BodyWrapper Infrared JSON: " + bodyWrapper.Value.ToJSON());
+                Console.WriteLine("BodyWrapper: " + bodyWrapper.Value.ToJSON().GetBytes());
+                Console.WriteLine("JSON Length: " + bodyWrapper.Value.ToJSON().GetBytes().Length);
+                // BodyLean, HandConfidence, etc.
             }
         }
-
     }
 }

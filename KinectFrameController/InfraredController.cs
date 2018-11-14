@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LightBuzz.Vitruvius;
-using KinectDataBase;
 
 namespace KinectFrameController
 {
@@ -21,7 +20,6 @@ namespace KinectFrameController
                 int i = random.Next(0, (int)Math.Pow(2, 16) - 1);
                 Console.WriteLine("\n" + i);
                 Console.WriteLine("Infrared data (ushort): " + infraredData.Key + ", Value: " + infraredData.Value.GetValue(i));
-                InfraredDataBase.WriteToDataBase(infraredData);
             }            
         }
 

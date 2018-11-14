@@ -11,13 +11,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectConstantsBGRA", "Kine
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectionInterface", "ProjectionInterface\ProjectionInterface.csproj", "{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectFrameController", "KinectFrameController\KinectFrameController.csproj", "{7EE05804-E99A-4122-8121-84BF49031F5C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectCameraFeedController", "KinectCameraController\KinectCameraFeedController.csproj", "{A743358B-3A25-4D3A-BDA3-A8832759F3B9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectFrameService", "KinectFrameService\KinectFrameService.csproj", "{102DB8CE-52EA-4E16-ADAB-B4C57669A78E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectDataBase", "KinectDataBase\KinectDataBase.csproj", "{BBB014E1-06A7-46D4-9B8E-EFB9D71478C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectDataBase", "KinectDataBase\KinectDataBase.csproj", "{487A8C49-C902-4EC1-BC66-C00EF83C1D3A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,14 +57,6 @@ Global
 		{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}.Release|x64.ActiveCfg = Release|Any CPU
 		{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}.Release|x64.Build.0 = Release|Any CPU
-		{7EE05804-E99A-4122-8121-84BF49031F5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7EE05804-E99A-4122-8121-84BF49031F5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7EE05804-E99A-4122-8121-84BF49031F5C}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{7EE05804-E99A-4122-8121-84BF49031F5C}.Debug|x64.Build.0 = Debug|Any CPU
-		{7EE05804-E99A-4122-8121-84BF49031F5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7EE05804-E99A-4122-8121-84BF49031F5C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7EE05804-E99A-4122-8121-84BF49031F5C}.Release|x64.ActiveCfg = Release|Any CPU
-		{7EE05804-E99A-4122-8121-84BF49031F5C}.Release|x64.Build.0 = Release|Any CPU
 		{A743358B-3A25-4D3A-BDA3-A8832759F3B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A743358B-3A25-4D3A-BDA3-A8832759F3B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A743358B-3A25-4D3A-BDA3-A8832759F3B9}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -83,14 +73,14 @@ Global
 		{102DB8CE-52EA-4E16-ADAB-B4C57669A78E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{102DB8CE-52EA-4E16-ADAB-B4C57669A78E}.Release|x64.ActiveCfg = Release|Any CPU
 		{102DB8CE-52EA-4E16-ADAB-B4C57669A78E}.Release|x64.Build.0 = Release|Any CPU
-		{BBB014E1-06A7-46D4-9B8E-EFB9D71478C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BBB014E1-06A7-46D4-9B8E-EFB9D71478C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BBB014E1-06A7-46D4-9B8E-EFB9D71478C2}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{BBB014E1-06A7-46D4-9B8E-EFB9D71478C2}.Debug|x64.Build.0 = Debug|Any CPU
-		{BBB014E1-06A7-46D4-9B8E-EFB9D71478C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BBB014E1-06A7-46D4-9B8E-EFB9D71478C2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BBB014E1-06A7-46D4-9B8E-EFB9D71478C2}.Release|x64.ActiveCfg = Release|Any CPU
-		{BBB014E1-06A7-46D4-9B8E-EFB9D71478C2}.Release|x64.Build.0 = Release|Any CPU
+		{487A8C49-C902-4EC1-BC66-C00EF83C1D3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{487A8C49-C902-4EC1-BC66-C00EF83C1D3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{487A8C49-C902-4EC1-BC66-C00EF83C1D3A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{487A8C49-C902-4EC1-BC66-C00EF83C1D3A}.Debug|x64.Build.0 = Debug|Any CPU
+		{487A8C49-C902-4EC1-BC66-C00EF83C1D3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{487A8C49-C902-4EC1-BC66-C00EF83C1D3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{487A8C49-C902-4EC1-BC66-C00EF83C1D3A}.Release|x64.ActiveCfg = Release|Any CPU
+		{487A8C49-C902-4EC1-BC66-C00EF83C1D3A}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

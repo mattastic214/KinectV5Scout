@@ -1,21 +1,20 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using LightBuzz.Vitruvius;
 
 namespace KinectDataBase
 {
-    public class InfraredDataBase
+    public class InfraredDataBase : IInfraredController
     {
-        public static void WriteToDataBase(KeyValuePair<TimeSpan, ushort[]> infraredData)
+        public void GetFrameData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData)
         {
-            string path = @"d:\\OneDrive\\DbText\\InfraredData.txt";
-
-            using (FileStream fs = File.Create(path))
-            {
-                byte[] info = new UTF8Encoding(true).GetBytes(infraredData.Value.ToString());
-                fs.Write(info, 0, info.Length);
-            }
+            Random random = new Random();
+            int i = random.Next(0, (int)Math.Pow(2, 16) - 1);
+            Console.WriteLine("\n" + i);
+            Console.WriteLine("Infrared data (ushort): " + infraredData.Key + ", Value: " + infraredData.Value.InfraredData.GetValue(i));
         }
     }
 }
