@@ -6,6 +6,6 @@ namespace KinectDataBase
 {
     public interface IInfraredController
     {
-        void GetFrameData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData);
+        void GetInfraredData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData);
     }
 }

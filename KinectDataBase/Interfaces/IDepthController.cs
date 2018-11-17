@@ -6,6 +6,6 @@ namespace KinectDataBase
 {
     public interface IDepthController
     {
-        void GetFrameData(KeyValuePair<TimeSpan, DepthBitmapGenerator> depthData);
+        void GetDepthData(KeyValuePair<TimeSpan, DepthBitmapGenerator> depthData);
     }
 }

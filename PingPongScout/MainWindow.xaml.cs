@@ -18,13 +18,10 @@ namespace PingPongScout
     /// </summary>
     public partial class MainWindow : Window
     {
-        
+
         #region Members
 
-        private BodyIndexDataBase BodyIndexDataBase = null;
-        private DepthDataBase DepthDataBase = null;
-        private InfraredDataBase InfraredDataBase = null;
-        private VitruviusDataBase VitruviusDataBase = null;
+        private DataBaseController DataBaseController = null;
 
         private KinectSensor _kinectSensor = null;
         //private KinectViewer _kinectViewer = null;                  // What use is this??
@@ -47,7 +44,7 @@ namespace PingPongScout
 
         #endregion
 
-        #region Initialization and OpenKinect Definitions
+        #region Constructors
 
         private void OpenKinect()
         {
@@ -76,12 +73,30 @@ namespace PingPongScout
             _bodyData = new Body[_kinectSensor.BodyFrameSource.BodyCount];
         }
 
+        private void InitializeDataAccessController()
+        {
+            DataBaseController = new DataBaseController();
+        }
+
+        private void AssignConstructors(int depthWidth, int depthHeight)
+        {
+            constructorOperation += OpenKinect;
+            constructorOperation += InitializeMultiSourceReader;
+            constructorOperation += (() => { InitializeBitmap(depthWidth, depthHeight); });
+            constructorOperation += (() => { InitializeFrameData(depthWidth, depthHeight); });
+            constructorOperation += InitializeDataAccessController;
+        }
+
         #endregion
+
+        #region MainWindow
 
         public MainWindow()
         {
             InitializeComponent();
         }
+
+        #endregion
 
         #region EventHandlers
 
@@ -107,10 +122,7 @@ namespace PingPongScout
                 int depthWidth = _kinectSensor.DepthFrameSource.FrameDescription.Width;
                 int depthHeight = _kinectSensor.DepthFrameSource.FrameDescription.Height;
 
-                constructorOperation += OpenKinect;
-                constructorOperation += InitializeMultiSourceReader;
-                constructorOperation += (() => { InitializeBitmap(depthWidth, depthHeight); });
-                constructorOperation += (() => { InitializeFrameData(depthWidth, depthHeight); });
+                AssignConstructors(depthHeight, depthHeight);
 
                 constructorOperation();
             }
@@ -120,36 +132,33 @@ namespace PingPongScout
         {
             MultiSourceFrame reference = e.FrameReference.AcquireFrame();
 
-            // Edit: Switch to routing with controllers (that have hidden implementation details).
             // COORDINATE MAPPING
             if (reference != null )
             {
                 TimeSpan timeStamp;
-                // Some kind of tracking 1.
+                // Body Index Tracking.
                 using (var bodyIndexFrame = reference.BodyIndexFrameReference.AcquireFrame())
                 using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
                 {
-                    // Does it cancel out the Table Tennis table? Yes!
-                    // Generates highlited bodyIndex frame and displays to camera.Source;
                     if (depthFrame != null && bodyIndexFrame != null)
                     {
                         _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
                         timeStamp = depthFrame.RelativeTime;
 
-                        BodyIndexDataBase.GetFrameData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));                        
+                        DataBaseController.GetBodyIndexData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));                        
                     }
                 }
 
-                // Some kind of tracking 2.
+                // Infrared and Object Depth Tracking.
                 using (var infraredFrame = reference.InfraredFrameReference.AcquireFrame())
                 using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
                 {
                     if (infraredFrame != null)
                     {
                         timeStamp = infraredFrame.RelativeTime;
-                        _infraredBitmapGenerator.Update(infraredFrame);                        
+                        _infraredBitmapGenerator.Update(infraredFrame);
 
-                        InfraredDataBase.GetFrameData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));
+                        DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));
                     }
 
                     if (depthFrame != null)
@@ -157,11 +166,11 @@ namespace PingPongScout
                         timeStamp = depthFrame.RelativeTime;
                         _depthBitmapGenerator.Update(depthFrame);
 
-                        DepthDataBase.GetFrameData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
+                        DataBaseController.GetDepthData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
                     }
                 }
 
-                // Some kind of tracking 3.
+                // Vitruvius Body Wrapper Tracking
                 using (var bodyFrame = reference.BodyFrameReference.AcquireFrame())
                 {
                     if (bodyFrame != null)
@@ -175,7 +184,7 @@ namespace PingPongScout
 
                         foreach (KeyValuePair<TimeSpan, BodyWrapper> kvp in trackedBodies)
                         {
-                            VitruviusDataBase.GetFrameData(kvp);
+                            DataBaseController.GetVitruviusData(kvp);
                         }
                     }
                 }

@@ -6,6 +6,6 @@ namespace KinectDataBase
 {
     public interface IBodyIndexController
     {
-        void GetFrameData(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData);
+        void GetBodyIndexData(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData);
     }
 }
