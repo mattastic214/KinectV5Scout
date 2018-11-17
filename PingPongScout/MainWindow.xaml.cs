@@ -21,6 +21,8 @@ namespace PingPongScout
 
         #region Members
 
+        private VitruviusRecorder VitruviusRecorder = null;
+
         private DataBaseController DataBaseController = null;
 
         private KinectSensor _kinectSensor = null;
@@ -136,6 +138,7 @@ namespace PingPongScout
             if (reference != null )
             {
                 TimeSpan timeStamp;
+
                 // Body Index Tracking.
                 using (var bodyIndexFrame = reference.BodyIndexFrameReference.AcquireFrame())
                 using (var depthFrame = reference.DepthFrameReference.AcquireFrame())

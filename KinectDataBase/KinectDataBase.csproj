@@ -52,5 +52,17 @@
     <Compile Include="Interfaces\IVitruviusBodyController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="KinectDataOutput\BodyIndex.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="KinectDataOutput\DepthData.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="KinectDataOutput\InfraredData.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="KinectDataOutput\Vitruvius.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
