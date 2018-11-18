@@ -34,11 +34,6 @@ namespace PingPongScout
         private DepthBitmapGenerator _depthBitmapGenerator = null;
 
         private ushort[] _depthData = null;
-        private ushort[] _infraredData = null;
-        private ushort[] _longExposureData = null;
-
-        private byte[] _bodyIndexData = null;
-        private byte[] _bodyDataRaw = null;
 
         private IList<Body> _bodyData = null;
 
@@ -81,10 +76,7 @@ namespace PingPongScout
 
             _bodyData = new Body[_kinectSensor.BodyFrameSource.BodyCount];
 
-            _infraredData = new ushort[depthWidth * depthHeight];
-            _depthData = new ushort[depthWidth * depthHeight];
-            _bodyIndexData = new byte[depthWidth * depthHeight];
-            _bodyDataRaw = new byte[depthArea * depthArea];
+            _depthData = new ushort[depthArea];
         }
 
         private void InitializeDataAccessController()
@@ -156,77 +148,39 @@ namespace PingPongScout
                 using (var infraredFrame = reference.InfraredFrameReference.AcquireFrame())
                 using (var longExposureFrame = reference.LongExposureInfraredFrameReference.AcquireFrame())                
                 {
-
-                }
-
-                // 1. Body Index Tracking.
-                using (var bodyIndexFrame = reference.BodyIndexFrameReference.AcquireFrame())
-                using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
-                {
-                    if (depthFrame != null && bodyIndexFrame != null)
-                    {
-                        // Need and object of both Frames and the depth Bitmap Generator.
-                        _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
-                        
-                        timeStamp = depthFrame.RelativeTime;
-
-                        _bodyIndexData = _depthBitmapGenerator.HighlightedPixels;
-                        _depthData = _depthBitmapGenerator.DepthData;
-                        _bodyDataRaw = _depthBitmapGenerator.BodyData;
-
-                        // var highlightedBitMap = _depthBitmapGenerator.HighlightedBitmap;
-                        // depthFrame.CopyFrameDataToArray(_depthData);
-                        // bodyIndexFrame.CopyFrameDataToArray(_bodyIndexData);
-
-                        // Keep using the _depthBitmapGenerator has several types of data needed.
-                        DataBaseController.GetBodyIndexData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
-                    }
-                }
-
-                // 2. Infrared and Object Depth Tracking.
-                using (var infraredFrame = reference.InfraredFrameReference.AcquireFrame())
-                using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
-                {
-                    if (infraredFrame != null)
-                    {
-                        // Need an object of the frame and the bitmap generator
-
-                        timeStamp = infraredFrame.RelativeTime;
-                        //_infraredBitmapGenerator.Update(infraredFrame);
-
-                        //_infraredData = _infraredBitmapGenerator.InfraredData;
-
-                        infraredFrame.CopyFrameDataToArray(_infraredData);
-
-                        // Just need the _infraredData[] array, not the extra stuff.                        
-                        DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, ushort[]>(timeStamp, _infraredData));
-                    }
-
+                    // 1a. Infrared and Object Depth Tracking.
                     if (depthFrame != null)
                     {
-                        // Need an object of the frame and the bitmap generator
                         timeStamp = depthFrame.RelativeTime;
                         _depthBitmapGenerator.Update(depthFrame);
 
-                        depthFrame.CopyFrameDataToArray(_depthData);
+                        _depthData = _depthBitmapGenerator.DepthData;
 
-                        // Needs new Data structure Kvp<TimeSpan, DataContainer>; 
                         DataBaseController.GetDepthData(new KeyValuePair<TimeSpan, ushort[]>(timeStamp, _depthData));
+
+                        // 2. Body Index Tracking.
+                        if (bodyIndexFrame != null)
+                        {
+                            _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
+
+                            DataBaseController.GetBodyIndexData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
+                        }
                     }
-                }
 
-                // 3. LongExposure Frame Tracking
-                using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
-                using (var longExposureFrame = reference.LongExposureInfraredFrameReference.AcquireFrame())
-                using (var bodyIndexFrame = reference.BodyIndexFrameReference.AcquireFrame())
-                {
-                    if (longExposureFrame != null && depthFrame != null && bodyIndexFrame != null)
+                    // 1b. Infrared and Object Depth Tracking.
+                    if (infraredFrame != null)
                     {
-                        timeStamp = longExposureFrame.RelativeTime;
+                        timeStamp = infraredFrame.RelativeTime;
 
-                        longExposureFrame.CopyFrameDataToArray(_longExposureData);
+                        _infraredBitmapGenerator.Update(infraredFrame);
 
-                        DataBaseController.GetLongExposureData(new KeyValuePair<TimeSpan, ushort[]>(timeStamp, _longExposureData));
+                        DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));
+
+                        // 3. LongExposure Frame Tracking
+                        if (longExposureFrame != null)
+                        {
+                            DataBaseController.GetLongExposureData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));
+                        }
                     }
                 }
 

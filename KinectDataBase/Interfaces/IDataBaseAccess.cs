@@ -11,9 +11,9 @@ namespace KinectDataBase
     {
         bool WriteDepthDataToDataBase(KeyValuePair<TimeSpan, ushort[]> depthData);
 
-        bool WriteInfraredDataToDataBase(KeyValuePair<TimeSpan, ushort[]> infraredData);
+        bool WriteInfraredDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData);
 
-        bool WriteLongExposureDataToDataBase(KeyValuePair<TimeSpan, ushort[]> longExposureData);
+        bool WriteLongExposureDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData);
 
         bool WriteBodyIndexDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData);
 

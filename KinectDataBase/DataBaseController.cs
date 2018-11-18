@@ -9,6 +9,11 @@ namespace KinectDataBase
 
         public DataBaseAccess DataBaseAccess = null;
 
+        public DataBaseController()
+        {
+            DataBaseAccess = new DataBaseAccess();
+        }
+
         public void GetBodyIndexData(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData)
         {
             DataBaseAccess.WriteBodyIndexDataToDataBase(bodyIndexData);
@@ -19,12 +24,12 @@ namespace KinectDataBase
             DataBaseAccess.WriteDepthDataToDataBase(depthData);
         }
 
-        public void GetInfraredData(KeyValuePair<TimeSpan, ushort[]> infraredData)
+        public void GetInfraredData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData)
         {
             DataBaseAccess.WriteInfraredDataToDataBase(infraredData);
         }
 
-        public void GetLongExposureData(KeyValuePair<TimeSpan, ushort[]> longExposureData)
+        public void GetLongExposureData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData)
         {
             DataBaseAccess.WriteLongExposureDataToDataBase(longExposureData);
         }

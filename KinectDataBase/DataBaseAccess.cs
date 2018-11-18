@@ -42,24 +42,24 @@ namespace KinectDataBase
             }
         }
 
-        public bool WriteInfraredDataToDataBase(KeyValuePair<TimeSpan, ushort[]> infraredData)
+        public bool WriteInfraredDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData)
         {
             i = random.Next(0, (int)Math.Pow(2, 16) - 1);
 
             using (StreamWriter str = File.AppendText(basePath + infraredDataPath))
             {
-                str.WriteLine("BodyFrameIndex Depth data (ushort): " + infraredData.Key + ", Value: " + infraredData.Value[i] + "\n");
+                str.WriteLine("BodyFrameIndex Depth data (ushort): " + infraredData.Key + ", Value: " + infraredData.Value.InfraredData.FirstOrDefault() + "\n");
                 return infraredData.Value != null;
             }
         }
 
-        public bool WriteLongExposureDataToDataBase(KeyValuePair<TimeSpan, ushort[]> longExposureData)
+        public bool WriteLongExposureDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData)
         {
             i = random.Next(0, (int)Math.Pow(2, 16) - 1);
 
             using (StreamWriter str = File.AppendText(basePath + longExposureDataPath))
             {
-                str.WriteLine("BodyFrameIndex Depth data (ushort): " + longExposureData.Key + ", Value: " + longExposureData.Value[i] + "\n");
+                str.WriteLine("BodyFrameIndex Depth data (ushort): " + longExposureData.Key + ", Value: " + longExposureData.Value + "\n");
                 return longExposureData.Value != null;
             }
         }
