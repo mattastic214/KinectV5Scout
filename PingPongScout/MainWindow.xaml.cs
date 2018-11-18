@@ -24,7 +24,7 @@ namespace PingPongScout
         private VitruviusRecorder VitruviusRecorder = null;
 
         private DataBaseController DataBaseController = null;
-
+        private TimeSpan timeStamp;
         private KinectSensor _kinectSensor = null;
         //private KinectViewer _kinectViewer = null;                  // What use is this??
         private MultiSourceFrameReader _multiSourceFrameReader = null;
@@ -140,9 +140,7 @@ namespace PingPongScout
 
             // COORDINATE MAPPING
             if (reference != null )
-            {
-                TimeSpan timeStamp;
-
+            {                
                 using (var bodyIndexFrame = reference.BodyIndexFrameReference.AcquireFrame())
                 using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
                 using (var infraredFrame = reference.InfraredFrameReference.AcquireFrame())
