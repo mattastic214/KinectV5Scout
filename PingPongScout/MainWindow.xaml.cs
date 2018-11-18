@@ -162,7 +162,7 @@ namespace PingPongScout
                         //bodyIndexFrame.CopyFrameDataToArray(_bodyIndexData);
 
                         // Needs new Data structure Kvp<TimeSpan, DataContainer>;
-                        DataBaseController.BodyIndexController.GetBodyIndexData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
+                        DataBaseController.GetBodyIndexData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
                     }
                 }
 
@@ -180,7 +180,7 @@ namespace PingPongScout
                         //infraredFrame.CopyFrameDataToArray(_infraredData);
 
                         // Needs new Data structure Kvp<TimeSpan, DataContainer>;
-                        DataBaseController.InfraredController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));
+                        DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));
                     }
 
                     if (depthFrame != null)
@@ -192,7 +192,7 @@ namespace PingPongScout
                         //depthFrame.CopyFrameDataToArray(_depthData);
 
                         // Needs new Data structure Kvp<TimeSpan, DataContainer>; 
-                        DataBaseController.DepthController.GetDepthData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
+                        DataBaseController.GetDepthData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
                     }
                 }
 
@@ -209,7 +209,7 @@ namespace PingPongScout
                                                     .ToList<BodyWrapper>();
 
                         var trackedBodies = new KeyValuePair<TimeSpan, IList<BodyWrapper>>(timeStamp, bodyDataList);
-                        DataBaseController.VitruviusController.GetVitruviusData(trackedBodies);
+                        DataBaseController.GetVitruviusData(trackedBodies);
                     }
                 }
             }
