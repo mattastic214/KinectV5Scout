@@ -11,17 +11,22 @@ namespace KinectDataBase
 
         public void GetBodyIndexData(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData)
         {
-            DataBaseAccess.WriteDepthBitMapToDataBase(bodyIndexData);
+            DataBaseAccess.WriteBodyIndexDataToDataBase(bodyIndexData);
         }
 
-        public void GetDepthData(KeyValuePair<TimeSpan, DepthBitmapGenerator> depthData)
+        public void GetDepthData(KeyValuePair<TimeSpan, ushort[]> depthData)
         {
-            DataBaseAccess.WriteDepthBitMapToDataBase(depthData);
+            DataBaseAccess.WriteDepthDataToDataBase(depthData);
         }
 
-        public void GetInfraredData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData)
+        public void GetInfraredData(KeyValuePair<TimeSpan, ushort[]> infraredData)
         {
-            DataBaseAccess.WriteInfraredBitMapToDataBase(infraredData);
+            DataBaseAccess.WriteInfraredDataToDataBase(infraredData);
+        }
+
+        public void GetLongExposureData(KeyValuePair<TimeSpan, ushort[]> longExposureData)
+        {
+            DataBaseAccess.WriteLongExposureDataToDataBase(longExposureData);
         }
 
         public void GetVitruviusData(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapper)

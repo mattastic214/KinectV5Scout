@@ -14,12 +14,13 @@ namespace KinectDataBase
         private string bodyIndexPath = @"BodyIndex.txt";
         private string depthDataPath = @"DepthData.txt";
         private string infraredDataPath = @"InfraredData.txt";
+        private string longExposureDataPath = @"LongExposureData.txt";
         private string vitruviusPath = @"Vitruvius.txt";
 
         private int i;
         private Random random = new Random();
 
-        public bool WriteBodyIndexDataBitMapToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData)
+        public bool WriteBodyIndexDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData)
         {
             i = random.Next(0, (int)Math.Pow(2, 16) - 1);
 
@@ -30,25 +31,36 @@ namespace KinectDataBase
             }
         }
 
-        public bool WriteDepthBitMapToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> depthData)
+        public bool WriteDepthDataToDataBase(KeyValuePair<TimeSpan, ushort[]> depthData)
         {
             i = random.Next(0, (int)Math.Pow(2, 16) - 1);
 
             using (StreamWriter str = File.AppendText(basePath + depthDataPath))
             {
-                str.WriteLine("Depth data (ushort): " + depthData.Key + ", Value: " + depthData.Value.DepthData.GetValue(i) + "\n");
-                return depthData.Value.Bitmap.Save(basePath);
+                str.WriteLine("Depth data (ushort): " + depthData.Key + ", Value: " + depthData.Value[i] + "\n");
+                return depthData.Value != null;
             }
         }
 
-        public bool WriteInfraredBitMapToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData)
+        public bool WriteInfraredDataToDataBase(KeyValuePair<TimeSpan, ushort[]> infraredData)
         {
             i = random.Next(0, (int)Math.Pow(2, 16) - 1);
 
             using (StreamWriter str = File.AppendText(basePath + infraredDataPath))
             {
-                str.WriteLine("BodyFrameIndex Depth data (ushort): " + infraredData.Key + ", Value: " + infraredData.Value.InfraredData.GetValue(i) + "\n");
-                return infraredData.Value.Bitmap.Save(basePath);
+                str.WriteLine("BodyFrameIndex Depth data (ushort): " + infraredData.Key + ", Value: " + infraredData.Value[i] + "\n");
+                return infraredData.Value != null;
+            }
+        }
+
+        public bool WriteLongExposureDataToDataBase(KeyValuePair<TimeSpan, ushort[]> longExposureData)
+        {
+            i = random.Next(0, (int)Math.Pow(2, 16) - 1);
+
+            using (StreamWriter str = File.AppendText(basePath + longExposureDataPath))
+            {
+                str.WriteLine("BodyFrameIndex Depth data (ushort): " + longExposureData.Key + ", Value: " + longExposureData.Value[i] + "\n");
+                return longExposureData.Value != null;
             }
         }
 

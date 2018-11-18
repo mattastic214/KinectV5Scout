@@ -8,9 +8,11 @@ namespace KinectDataBase
     {
         void GetBodyIndexData(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData);
 
-        void GetDepthData(KeyValuePair<TimeSpan, DepthBitmapGenerator> depthData);
+        void GetDepthData(KeyValuePair<TimeSpan, ushort[]> depthData);
 
-        void GetInfraredData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData);
+        void GetInfraredData(KeyValuePair<TimeSpan, ushort[]> infraredData);
+
+        void GetLongExposureData(KeyValuePair<TimeSpan, ushort[]> longExposureData);
 
         void GetVitruviusData(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapper);
     }

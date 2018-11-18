@@ -65,5 +65,8 @@
   <ItemGroup>
     <Resource Include="KinectDataOutput\Vitruvius.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="KinectDataOutput\LongExposureData.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

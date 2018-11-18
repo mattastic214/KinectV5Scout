@@ -35,7 +35,10 @@ namespace PingPongScout
 
         private ushort[] _depthData = null;
         private ushort[] _infraredData = null;
+        private ushort[] _longExposureData = null;
+
         private byte[] _bodyIndexData = null;
+        private byte[] _bodyDataRaw = null;
 
         private IList<Body> _bodyData = null;
 
@@ -61,7 +64,7 @@ namespace PingPongScout
         private void InitializeMultiSourceReader()
         {
             _multiSourceFrameReader = _kinectSensor
-                    .OpenMultiSourceFrameReader(FrameSourceTypes.Body | FrameSourceTypes.BodyIndex | FrameSourceTypes.Depth | FrameSourceTypes.Infrared);
+                    .OpenMultiSourceFrameReader(FrameSourceTypes.Body | FrameSourceTypes.BodyIndex | FrameSourceTypes.Depth | FrameSourceTypes.Infrared | FrameSourceTypes.LongExposureInfrared);
 
             _multiSourceFrameReader.MultiSourceFrameArrived += MultiSourceFrameArrived;
         }
@@ -81,6 +84,7 @@ namespace PingPongScout
             _infraredData = new ushort[depthWidth * depthHeight];
             _depthData = new ushort[depthWidth * depthHeight];
             _bodyIndexData = new byte[depthWidth * depthHeight];
+            _bodyDataRaw = new byte[depthArea * depthArea];
         }
 
         private void InitializeDataAccessController()
@@ -147,7 +151,15 @@ namespace PingPongScout
             {
                 TimeSpan timeStamp;
 
-                // Body Index Tracking.
+                using (var bodyIndexFrame = reference.BodyIndexFrameReference.AcquireFrame())
+                using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
+                using (var infraredFrame = reference.InfraredFrameReference.AcquireFrame())
+                using (var longExposureFrame = reference.LongExposureInfraredFrameReference.AcquireFrame())                
+                {
+
+                }
+
+                // 1. Body Index Tracking.
                 using (var bodyIndexFrame = reference.BodyIndexFrameReference.AcquireFrame())
                 using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
                 {
@@ -158,15 +170,20 @@ namespace PingPongScout
                         
                         timeStamp = depthFrame.RelativeTime;
 
-                        //depthFrame.CopyFrameDataToArray(_depthData);
-                        //bodyIndexFrame.CopyFrameDataToArray(_bodyIndexData);
+                        _bodyIndexData = _depthBitmapGenerator.HighlightedPixels;
+                        _depthData = _depthBitmapGenerator.DepthData;
+                        _bodyDataRaw = _depthBitmapGenerator.BodyData;
 
-                        // Needs new Data structure Kvp<TimeSpan, DataContainer>;
+                        // var highlightedBitMap = _depthBitmapGenerator.HighlightedBitmap;
+                        // depthFrame.CopyFrameDataToArray(_depthData);
+                        // bodyIndexFrame.CopyFrameDataToArray(_bodyIndexData);
+
+                        // Keep using the _depthBitmapGenerator has several types of data needed.
                         DataBaseController.GetBodyIndexData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
                     }
                 }
 
-                // Infrared and Object Depth Tracking.
+                // 2. Infrared and Object Depth Tracking.
                 using (var infraredFrame = reference.InfraredFrameReference.AcquireFrame())
                 using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
                 {
@@ -175,12 +192,14 @@ namespace PingPongScout
                         // Need an object of the frame and the bitmap generator
 
                         timeStamp = infraredFrame.RelativeTime;
-                        _infraredBitmapGenerator.Update(infraredFrame);
+                        //_infraredBitmapGenerator.Update(infraredFrame);
 
-                        //infraredFrame.CopyFrameDataToArray(_infraredData);
+                        //_infraredData = _infraredBitmapGenerator.InfraredData;
 
-                        // Needs new Data structure Kvp<TimeSpan, DataContainer>;
-                        DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));
+                        infraredFrame.CopyFrameDataToArray(_infraredData);
+
+                        // Just need the _infraredData[] array, not the extra stuff.                        
+                        DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, ushort[]>(timeStamp, _infraredData));
                     }
 
                     if (depthFrame != null)
@@ -189,14 +208,29 @@ namespace PingPongScout
                         timeStamp = depthFrame.RelativeTime;
                         _depthBitmapGenerator.Update(depthFrame);
 
-                        //depthFrame.CopyFrameDataToArray(_depthData);
+                        depthFrame.CopyFrameDataToArray(_depthData);
 
                         // Needs new Data structure Kvp<TimeSpan, DataContainer>; 
-                        DataBaseController.GetDepthData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
+                        DataBaseController.GetDepthData(new KeyValuePair<TimeSpan, ushort[]>(timeStamp, _depthData));
                     }
                 }
 
-                // Vitruvius Body Wrapper Tracking
+                // 3. LongExposure Frame Tracking
+                using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
+                using (var longExposureFrame = reference.LongExposureInfraredFrameReference.AcquireFrame())
+                using (var bodyIndexFrame = reference.BodyIndexFrameReference.AcquireFrame())
+                {
+                    if (longExposureFrame != null && depthFrame != null && bodyIndexFrame != null)
+                    {
+                        timeStamp = longExposureFrame.RelativeTime;
+
+                        longExposureFrame.CopyFrameDataToArray(_longExposureData);
+
+                        DataBaseController.GetLongExposureData(new KeyValuePair<TimeSpan, ushort[]>(timeStamp, _longExposureData));
+                    }
+                }
+
+                // 4. Vitruvius Body Wrapper Tracking
                 using (var bodyFrame = reference.BodyFrameReference.AcquireFrame())
                 {
                     if (bodyFrame != null)
