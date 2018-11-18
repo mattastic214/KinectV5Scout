@@ -35,6 +35,7 @@
       <HintPath>..\..\..\assemblies\Vitruvius_(Premium)\LightBuzz.Vitruvius.5.0.1\LightBuzz.Vitruvius.4.5.0-Legacy\Assemblies\WPF\LightBuzz.Vitruvius.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Kinect, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -43,9 +44,16 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interfaces\Controller.cs" />
+    <Compile Include="Controllers\BodyIndexController.cs" />
+    <Compile Include="Controllers\DepthController.cs" />
+    <Compile Include="Controllers\InfraredController.cs" />
+    <Compile Include="Controllers\VitruviusController.cs" />
     <Compile Include="DataBaseController.cs" />
+    <Compile Include="Factories\DataBaseControllerFactory.cs" />
     <Compile Include="Interfaces\IBodyIndexController.cs" />
     <Compile Include="Interfaces\IDepthController.cs" />
     <Compile Include="Interfaces\IInfraredController.cs" />

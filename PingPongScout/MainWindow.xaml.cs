@@ -33,6 +33,10 @@ namespace PingPongScout
         private InfraredBitmapGenerator _infraredBitmapGenerator = null;
         private DepthBitmapGenerator _depthBitmapGenerator = null;
 
+        private ushort[] _depthData = null;
+        private ushort[] _infraredData = null;
+        private byte[] _bodyIndexData = null;
+
         private IList<Body> _bodyData = null;
 
         #endregion
@@ -73,6 +77,10 @@ namespace PingPongScout
             int depthArea = depthWidth * depthHeight;
 
             _bodyData = new Body[_kinectSensor.BodyFrameSource.BodyCount];
+
+            _infraredData = new ushort[depthWidth * depthHeight];
+            _depthData = new ushort[depthWidth * depthHeight];
+            _bodyIndexData = new byte[depthWidth * depthHeight];
         }
 
         private void InitializeDataAccessController()
@@ -145,10 +153,16 @@ namespace PingPongScout
                 {
                     if (depthFrame != null && bodyIndexFrame != null)
                     {
+                        // Need and object of both Frames and the depth Bitmap Generator.
                         _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
+                        
                         timeStamp = depthFrame.RelativeTime;
 
-                        DataBaseController.GetBodyIndexData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));                        
+                        //depthFrame.CopyFrameDataToArray(_depthData);
+                        //bodyIndexFrame.CopyFrameDataToArray(_bodyIndexData);
+
+                        // Needs new Data structure Kvp<TimeSpan, DataContainer>;
+                        DataBaseController.BodyIndexController.GetBodyIndexData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
                     }
                 }
 
@@ -158,18 +172,27 @@ namespace PingPongScout
                 {
                     if (infraredFrame != null)
                     {
+                        // Need an object of the frame and the bitmap generator
+
                         timeStamp = infraredFrame.RelativeTime;
                         _infraredBitmapGenerator.Update(infraredFrame);
 
-                        DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));
+                        //infraredFrame.CopyFrameDataToArray(_infraredData);
+
+                        // Needs new Data structure Kvp<TimeSpan, DataContainer>;
+                        DataBaseController.InfraredController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));
                     }
 
                     if (depthFrame != null)
                     {
+                        // Need an object of the frame and the bitmap generator
                         timeStamp = depthFrame.RelativeTime;
                         _depthBitmapGenerator.Update(depthFrame);
 
-                        DataBaseController.GetDepthData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
+                        //depthFrame.CopyFrameDataToArray(_depthData);
+
+                        // Needs new Data structure Kvp<TimeSpan, DataContainer>; 
+                        DataBaseController.DepthController.GetDepthData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
                     }
                 }
 
@@ -181,14 +204,12 @@ namespace PingPongScout
                         bodyFrame.GetAndRefreshBodyData(_bodyData);
                         timeStamp = bodyFrame.RelativeTime;
 
-                        var trackedBodies = _bodyData.Where(b => b.IsTracked)
-                                                    .Select(b => new KeyValuePair<TimeSpan, BodyWrapper>(timeStamp, BodyWrapper
-                                                    .Create(b, _coordinateMapper, Visualization.Infrared)) );
+                        var bodyDataList = _bodyData.Where(b => b.IsTracked)
+                                                    .Select(b => BodyWrapper.Create(b, _coordinateMapper, Visualization.Infrared))
+                                                    .ToList<BodyWrapper>();
 
-                        foreach (KeyValuePair<TimeSpan, BodyWrapper> kvp in trackedBodies)
-                        {
-                            DataBaseController.GetVitruviusData(kvp);
-                        }
+                        var trackedBodies = new KeyValuePair<TimeSpan, IList<BodyWrapper>>(timeStamp, bodyDataList);
+                        DataBaseController.VitruviusController.GetVitruviusData(trackedBodies);
                     }
                 }
             }

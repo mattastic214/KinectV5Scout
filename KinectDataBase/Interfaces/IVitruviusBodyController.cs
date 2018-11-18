@@ -6,6 +6,6 @@ namespace KinectDataBase
 {
     public interface IVitruviusBodyController
     {
-        void GetVitruviusData(KeyValuePair<TimeSpan, BodyWrapper> bodyWrapper);
+        void GetVitruviusData(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapper);
     }
 }
