@@ -141,10 +141,7 @@ namespace PingPongScout
             // COORDINATE MAPPING
             if (reference != null )
             {                
-                using (var bodyIndexFrame = reference.BodyIndexFrameReference.AcquireFrame())
                 using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
-                using (var infraredFrame = reference.InfraredFrameReference.AcquireFrame())
-                using (var longExposureFrame = reference.LongExposureInfraredFrameReference.AcquireFrame())                
                 {
                     // 1a. Infrared and Object Depth Tracking.
                     if (depthFrame != null)
@@ -156,15 +153,20 @@ namespace PingPongScout
 
                         DataBaseController.GetDepthData(new KeyValuePair<TimeSpan, ushort[]>(timeStamp, _depthData));
 
-                        // 2. Body Index Tracking.
-                        if (bodyIndexFrame != null)
+                        using (var bodyIndexFrame = reference.BodyIndexFrameReference.AcquireFrame())
                         {
-                            _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
+                            if (bodyIndexFrame != null)
+                            {
+                                _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
 
-                            DataBaseController.GetBodyIndexData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
+                                DataBaseController.GetBodyIndexData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
+                            }
                         }
                     }
+                }
 
+                using (var infraredFrame = reference.InfraredFrameReference.AcquireFrame())
+                {
                     // 1b. Infrared and Object Depth Tracking.
                     // 3. LongExposure Frame Tracking (Infrared)
                     if (infraredFrame != null)
@@ -173,9 +175,21 @@ namespace PingPongScout
 
                         _infraredBitmapGenerator.Update(infraredFrame);
 
-                        DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));                        
+                        DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));
+
+                        using (var longExposureFrame = reference.LongExposureInfraredFrameReference.AcquireFrame())
+                        {
+                            if (longExposureFrame != null)
+                            {
+                                _infraredBitmapGenerator.Update(infraredFrame);
+
+                                DataBaseController.GetLongExposureData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));
+                            }
+                        }
                     }
                 }
+
+                
 
                 // 4. Vitruvius Body Wrapper Tracking
                 using (var bodyFrame = reference.BodyFrameReference.AcquireFrame())
@@ -187,7 +201,7 @@ namespace PingPongScout
 
                         var bodyDataList = _bodyData.Where(b => b.IsTracked)
                                                     .Select(b => BodyWrapper.Create(b, _coordinateMapper, Visualization.Infrared))
-                                                    .ToList<BodyWrapper>();
+                                                    .ToList();
 
                         var trackedBodies = new KeyValuePair<TimeSpan, IList<BodyWrapper>>(timeStamp, bodyDataList);
                         DataBaseController.GetVitruviusData(trackedBodies);
