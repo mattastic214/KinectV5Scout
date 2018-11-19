@@ -166,19 +166,14 @@ namespace PingPongScout
                     }
 
                     // 1b. Infrared and Object Depth Tracking.
+                    // 3. LongExposure Frame Tracking (Infrared)
                     if (infraredFrame != null)
                     {
                         timeStamp = infraredFrame.RelativeTime;
 
                         _infraredBitmapGenerator.Update(infraredFrame);
 
-                        DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));
-
-                        // 3. LongExposure Frame Tracking
-                        if (longExposureFrame != null)
-                        {
-                            DataBaseController.GetLongExposureData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));
-                        }
+                        DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));                        
                     }
                 }
 
