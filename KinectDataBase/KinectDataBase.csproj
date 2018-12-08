@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataBaseAccess.cs" />
+    <Compile Include="Interfaces\IApplyKey.cs" />
     <Compile Include="Interfaces\IDataBaseAccess.cs" />
     <Compile Include="DataBaseController.cs" />
     <Compile Include="Interfaces\IController.cs" />

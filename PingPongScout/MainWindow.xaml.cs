@@ -72,11 +72,9 @@ namespace PingPongScout
 
         private void InitializeFrameData(int depthWidth, int depthHeight)
         {
-            int depthArea = depthWidth * depthHeight;
-
             _bodyData = new Body[_kinectSensor.BodyFrameSource.BodyCount];
 
-            _depthData = new ushort[depthArea];
+            _depthData = new ushort[depthWidth * depthHeight];
         }
 
         private void InitializeDataAccessController()
@@ -188,8 +186,6 @@ namespace PingPongScout
                         }
                     }
                 }
-
-                
 
                 // 4. Vitruvius Body Wrapper Tracking
                 using (var bodyFrame = reference.BodyFrameReference.AcquireFrame())
