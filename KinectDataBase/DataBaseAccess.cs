@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +17,7 @@ namespace KinectDataBase
         private string infraredDataPath = @"InfraredData.txt";
         private string longExposureDataPath = @"LongExposureData.txt";
         private string vitruviusPath = @"Vitruvius.txt";
+        StringBuilder sb = new StringBuilder();
 
         private int i;
         private Random random = new Random();
@@ -64,18 +66,28 @@ namespace KinectDataBase
             }
         }
 
-        public void WriteVitruviusToDataBase(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapper)
+        public void WriteVitruviusToDataBase(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapperList)
         {
             using (StreamWriter str = File.AppendText(basePath + vitruviusPath))
+            using (StringWriter strwtr = new StringWriter(sb))
+            using (JsonTextWriter writer = new JsonTextWriter(strwtr))
             {
-                var vitBody = bodyWrapper.Value.FirstOrDefault();
-                str.WriteLine("Depth data (ushort) Time stamp: " + bodyWrapper.Key + ", Values:");
-                // Check if null before writing.
-                //str.WriteLine("Tracking ID: " + vitBody.TrackingId);
-                //str.WriteLine("Upper Height: " + vitBody.UpperHeight());
-                //str.WriteLine("BodyWrapper Infrared JSON: " + vitBody.ToJSON());
-                //str.WriteLine("BodyWrapper: " + vitBody);
-                //str.WriteLine("JSON Length: " + vitBody.ToJSON().Length + "\n\n");
+                IList<BodyWrapper> bodyList = bodyWrapperList.Value;
+                TimeSpan time = bodyWrapperList.Key;
+                // Create new JSON { "RelativeTime": time, "TrackingId": body.TrackingId }
+
+                foreach (BodyWrapper body in bodyList)
+                {
+                    // Write single JSON object of 2 JSON objects: [ { "TimeStampId": { xxx }, { "VitruviusBody": { xxxx } } ]
+                    writer.WriteStartObject();
+                    writer.WritePropertyName("RelativeTime");
+                    writer.WriteValue(time);                    
+                    writer.WritePropertyName("TrackingId");
+                    writer.WriteValue(body.TrackingId);
+                    writer.WriteEndObject();
+                    str.WriteLine(sb.ToString() + "," + body.ToJSON());
+                }
+                sb.Clear();
             }
         }
 
