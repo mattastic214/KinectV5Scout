@@ -74,19 +74,22 @@ namespace KinectDataBase
             {
                 IList<BodyWrapper> bodyList = bodyWrapperList.Value;
                 TimeSpan time = bodyWrapperList.Key;
-                // Create new JSON { "RelativeTime": time, "TrackingId": body.TrackingId }
+
+                writer.WriteStartObject();
+                writer.WritePropertyName("RelativeTime");
+                writer.WriteValue(time);
+
+                writer.WritePropertyName("TrackedPlayers");
+                writer.WriteStartArray();
 
                 foreach (BodyWrapper body in bodyList)
                 {
-                    // Write single JSON object of 2 JSON objects: [ { "TimeStampId": { xxx }, { "VitruviusBody": { xxxx } } ]
-                    writer.WriteStartObject();
-                    writer.WritePropertyName("RelativeTime");
-                    writer.WriteValue(time);                    
-                    writer.WritePropertyName("TrackingId");
-                    writer.WriteValue(body.TrackingId);
-                    writer.WriteEndObject();
-                    str.WriteLine(sb.ToString() + "," + body.ToJSON());
+                    Console.WriteLine(body.ToJSON());
+                    writer.WriteRaw(body.ToJSON());
                 }
+                writer.WriteEndArray();
+                writer.WriteEndObject();
+                str.WriteLine(sb.ToString());
                 sb.Clear();
             }
         }

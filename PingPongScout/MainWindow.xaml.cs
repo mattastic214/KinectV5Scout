@@ -7,9 +7,17 @@ using System.Threading.Tasks;
 using LightBuzz.Vitruvius.Controls; // Use for KinectViewer. What does it do?
 using System.Linq;
 using KinectDataBase;
+using KinectConstantsBGRA;
 
 namespace PingPongScout
 {
+    enum CameraType
+    {
+        BodyIndex,
+        Infrared,
+        Color
+    };
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// DepthFrame
@@ -21,7 +29,8 @@ namespace PingPongScout
 
         #region Members
 
-        private VitruviusRecorder VitruviusRecorder = null;
+        readonly int cameraView = (int)CameraType.BodyIndex;
+        //private VitruviusRecorder VitruviusRecorder = null;
 
         private DataBaseController DataBaseController = null;
         private TimeSpan timeStamp;
@@ -156,8 +165,12 @@ namespace PingPongScout
                             if (bodyIndexFrame != null)
                             {
                                 _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
-
                                 DataBaseController.GetBodyIndexData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
+
+                                if (cameraView == (int)CameraType.BodyIndex)
+                                {
+                                    camera.Source = DepthExtensions.ToBitmap(depthFrame, bodyIndexFrame);       // Looks like the Predator. Not needed Modularized version refactor.
+                                }
                             }
                         }
                     }
@@ -183,6 +196,11 @@ namespace PingPongScout
 
                                 DataBaseController.GetLongExposureData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));
                             }
+                        }
+
+                        if (cameraView == (int)CameraType.Infrared)
+                        {
+                            camera.Source = InfraredExtensions.ToBitmap(infraredFrame);
                         }
                     }
                 }
