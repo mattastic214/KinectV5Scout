@@ -66,6 +66,7 @@ namespace KinectDataBase
             }
         }
 
+        // Need to work through major performance issues when 2 people present.
         public void WriteVitruviusToDataBase(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapperList)
         {
             using (StreamWriter str = File.AppendText(basePath + vitruviusPath))
@@ -79,15 +80,12 @@ namespace KinectDataBase
                 writer.WritePropertyName("RelativeTime");
                 writer.WriteValue(time);
 
-                writer.WritePropertyName("TrackedPlayers");
-                writer.WriteStartArray();
+                writer.WritePropertyName("TrackedPlayer");
 
                 foreach (BodyWrapper body in bodyList)
                 {
-                    Console.WriteLine(body.ToJSON());
                     writer.WriteRaw(body.ToJSON());
                 }
-                writer.WriteEndArray();
                 writer.WriteEndObject();
                 str.WriteLine(sb.ToString());
                 sb.Clear();

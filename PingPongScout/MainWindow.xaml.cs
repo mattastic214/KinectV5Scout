@@ -8,6 +8,9 @@ using LightBuzz.Vitruvius.Controls; // Use for KinectViewer. What does it do?
 using System.Linq;
 using KinectDataBase;
 using KinectConstantsBGRA;
+using System.Windows.Shapes;
+using System.Windows.Media;
+using System.Windows.Controls;
 
 namespace PingPongScout
 {
@@ -15,7 +18,8 @@ namespace PingPongScout
     {
         BodyIndex,
         Infrared,
-        Color
+        Skeletal,
+        None
     };
 
     /// <summary>
@@ -29,7 +33,7 @@ namespace PingPongScout
 
         #region Members
 
-        readonly int cameraView = (int)CameraType.BodyIndex;
+        readonly int cameraView = (int)CameraType.None;
         //private VitruviusRecorder VitruviusRecorder = null;
 
         private DataBaseController DataBaseController = null;
@@ -219,6 +223,36 @@ namespace PingPongScout
 
                         var trackedBodies = new KeyValuePair<TimeSpan, IList<BodyWrapper>>(timeStamp, bodyDataList);
                         DataBaseController.GetVitruviusData(trackedBodies);
+
+                        if (cameraView == (int)CameraType.Skeletal)
+                        {
+                            // Foreach 2: Draw Joint to canvas
+                            foreach (BodyWrapper bodyWrapper in bodyDataList)
+                            {
+                                if (bodyWrapper.IsTracked)
+                                {
+                                    var trackedJoints = bodyWrapper.TrackedJoints(false);
+
+                                    foreach (Joint joint in trackedJoints)
+                                    {
+                                        DepthSpacePoint depthPoint = _kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(joint.Position);
+                                        ColorSpacePoint colorPoint = _kinectSensor.CoordinateMapper.MapCameraPointToColorSpace(joint.Position);
+
+                                        Ellipse ellipse = new Ellipse
+                                        {
+                                            Fill = Brushes.Red,
+                                            Width = 30,
+                                            Height = 30
+                                        };
+
+                                        Canvas.SetLeft(ellipse, (colorPoint.X - ellipse.Width / 2));
+                                        Canvas.SetTop(ellipse, (colorPoint.Y - ellipse.Width / 2));
+
+                                        canvas.Children.Add(ellipse);                                   // Not needed Modularized version refactor.
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
