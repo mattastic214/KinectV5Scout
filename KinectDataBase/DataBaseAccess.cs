@@ -11,85 +11,140 @@ namespace KinectDataBase
 {
     public class DataBaseAccess : IDataBaseAccess
     {
+        /**
+         * Multithreading problems:
+         * The string variables exist in state in the scope of 'this' {KinectDatabase.DatabaseAccess}
+         * However, a created thread 'Task' holds access to the variables basePath and 'bodyIndexPath.txt'
+         * or whichever file .txt it would need at the time. DataBaseAccess should not control state.
+         * State should be passed down from a layer that manages state to lower layers.
+         *
+        **/
+        
         private string basePath = @"..\..\..\KinectDataBase\KinectDataOutput\";
         private string bodyIndexPath = @"BodyIndex.txt";
         private string depthDataPath = @"DepthData.txt";
         private string infraredDataPath = @"InfraredData.txt";
         private string longExposureDataPath = @"LongExposureData.txt";
         private string vitruviusPath = @"Vitruvius.txt";
+        private readonly object fileLock = new object();
         StringBuilder sb = new StringBuilder();
 
         private int i;
         private Random random = new Random();
 
-        public bool WriteBodyIndexDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData)
+        public Task WriteBodyIndexDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData)
         {
             i = random.Next(0, (int)Math.Pow(2, 16) - 1);
 
-            using (StreamWriter str = File.AppendText(basePath + bodyIndexPath))
+            Task t = Task.Run(() =>
             {
-                str.WriteLine("Depth data (ushort): " + bodyIndexData.Key + ", Value: " + bodyIndexData.Value.DepthData.GetValue(i) + "\n");
-                return bodyIndexData.Value.Bitmap.Save(basePath);
-            }
+                lock (fileLock)
+                {
+                    using (StreamWriter str = File.AppendText(basePath + bodyIndexPath))
+                    {
+                        // var path = "BodyIndex.txt";
+                        str.WriteLine("Depth data (ushort): " + bodyIndexData.Key + ", Value: " + bodyIndexData.Value.DepthData.GetValue(i) + "\n");
+                        bodyIndexData.Value.Bitmap.Save(basePath);
+                    }
+                }
+            });
+
+            return t;
         }
 
-        public bool WriteDepthDataToDataBase(KeyValuePair<TimeSpan, ushort[]> depthData)
+        public Task WriteDepthDataToDataBase(KeyValuePair<TimeSpan, ushort[]> depthData)
         {
             i = random.Next(0, (int)Math.Pow(2, 16) - 1);
 
-            using (StreamWriter str = File.AppendText(basePath + depthDataPath))
+            Task t = Task.Run(() =>
             {
-                str.WriteLine("Depth data (ushort): " + depthData.Key + ", Value: " + depthData.Value[i] + "\n");
-                return depthData.Value != null;
-            }
+                lock (fileLock)
+                {
+                    using (StreamWriter str = File.AppendText(basePath + depthDataPath))
+                    {
+                        str.WriteLine("Depth data (ushort): " + depthData.Key + ", Value: " + depthData.Value[i] + "\n");
+                        // return depthData.Value != null;
+                    }
+                }
+            });
+
+            return t;
         }
 
-        public bool WriteInfraredDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData)
+        public Task WriteInfraredDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData)
         {
-            i = random.Next(0, (int)Math.Pow(2, 16) - 1);
-
-            using (StreamWriter str = File.AppendText(basePath + infraredDataPath))
+            Task t = Task.Run(() =>
             {
-                str.WriteLine("BodyFrameIndex Depth data (ushort): " + infraredData.Key + ", Value: " + infraredData.Value.InfraredData.FirstOrDefault() + "\n");
-                return infraredData.Value != null;
-            }
+                lock (fileLock)
+                {
+                    using (StreamWriter str = File.AppendText(basePath + infraredDataPath))
+                    {
+                        str.WriteLine("BodyFrameIndex Depth data (ushort): " + infraredData.Key + ", Value: " + infraredData.Value.InfraredData.FirstOrDefault() + "\n");
+                        // return infraredData.Value != null;
+                    }
+                }
+            });
+
+            return t;
         }
 
-        public bool WriteLongExposureDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData)
+        public Task WriteLongExposureDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData)
         {
-            i = random.Next(0, (int)Math.Pow(2, 16) - 1);
-
-            using (StreamWriter str = File.AppendText(basePath + longExposureDataPath))
+            Task t = Task.Run(() =>
             {
-                str.WriteLine("BodyFrameIndex Depth data (ushort): " + longExposureData.Key + ", Value: " + longExposureData.Value + "\n");
-                return longExposureData.Value != null;
-            }
+                lock (fileLock)
+                {
+                    using (StreamWriter str = File.AppendText(basePath + longExposureDataPath))
+                    {
+                        str.WriteLine("BodyFrameIndex Depth data (ushort): " + longExposureData.Key + ", Value: " + longExposureData.Value + "\n");
+                        return longExposureData.Value != null;
+                    }
+                }
+            });
+
+            return t;
         }
 
         // Need to work through major performance issues when 2 people present.
-        public void WriteVitruviusToDataBase(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapperList)
+
+        // Use Node.js Asynchronous concept:
+        // 1. Send the task to the computer's file system.
+        // 2. Ready to handle the next request
+        // 3. When the file system has opened and read the file, the server returns the content to the client.
+        // Node.js eliminates the waiting, and simply continues with the next request.
+        // Node.js runs single-threaded, non-blocking, asynchronously programming, which is very memory efficient.
+        public Task WriteVitruviusToDataBase(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapperList)
         {
-            using (StreamWriter str = File.AppendText(basePath + vitruviusPath))
-            using (StringWriter strwtr = new StringWriter(sb))
-            using (JsonTextWriter writer = new JsonTextWriter(strwtr))
+            IList<BodyWrapper> bodyList = bodyWrapperList.Value;
+            TimeSpan time = bodyWrapperList.Key;
+
+            Task t = Task.Run(() =>
             {
-                IList<BodyWrapper> bodyList = bodyWrapperList.Value;
-                TimeSpan time = bodyWrapperList.Key;
-
-                writer.WriteStartObject();
-                writer.WritePropertyName("RelativeTime");
-                writer.WriteValue(time);
-
-                writer.WritePropertyName("TrackedPlayer");
-
-                foreach (BodyWrapper body in bodyList)
+                lock (fileLock)
                 {
-                    writer.WriteRaw(body.ToJSON());
+                    using (StreamWriter str = File.AppendText(basePath + vitruviusPath))
+                    using (StringWriter strwtr = new StringWriter(sb))
+                    using (JsonTextWriter writer = new JsonTextWriter(strwtr))
+                    {
+                        writer.WriteStartObject();
+                        writer.WritePropertyName("RelativeTime");
+                        writer.WriteValue(time);
+
+                        writer.WritePropertyName("TrackedPlayer");
+
+                        /* Code to write to same location on disk. Lock Thread. */
+                        foreach (BodyWrapper body in bodyList)
+                        {
+                            writer.WriteRaw(body.ToJSON());
+                            writer.WriteEndObject();
+                            str.WriteLine(sb.ToString());
+                            sb.Clear();
+                        }
+                    }
                 }
-                writer.WriteEndObject();
-                str.WriteLine(sb.ToString());
-                sb.Clear();
-            }
+            });
+
+            return t;
         }
 
     }

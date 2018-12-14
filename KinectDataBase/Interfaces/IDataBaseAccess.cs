@@ -9,14 +9,14 @@ namespace KinectDataBase
 {
     public interface IDataBaseAccess
     {
-        bool WriteDepthDataToDataBase(KeyValuePair<TimeSpan, ushort[]> depthData);
+        Task WriteDepthDataToDataBase(KeyValuePair<TimeSpan, ushort[]> depthData);
 
-        bool WriteInfraredDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData);
+        Task WriteInfraredDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData);
 
-        bool WriteLongExposureDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData);
+        Task WriteLongExposureDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData);
 
-        bool WriteBodyIndexDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData);
+        Task WriteBodyIndexDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData);
 
-        void WriteVitruviusToDataBase(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapper);
+        Task WriteVitruviusToDataBase(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapper);
     }
 }

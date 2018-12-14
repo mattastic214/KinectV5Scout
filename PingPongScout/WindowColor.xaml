@@ -13,7 +13,7 @@
         Closed="Window_Closed">
     <Grid Background="Black">
         <Viewbox>
-            <Grid Width="1920" Height="1080">
+            <Grid Name="grid" Width="1920" Height="1080">
                 <Image Name="camera" Stretch="Uniform" />
                 <Canvas Name="canvas">
                 </Canvas>

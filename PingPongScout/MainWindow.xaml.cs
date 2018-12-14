@@ -33,7 +33,7 @@ namespace PingPongScout
 
         #region Members
 
-        readonly int cameraView = (int)CameraType.None;
+        readonly CameraType cameraView = CameraType.Skeletal;
         //private VitruviusRecorder VitruviusRecorder = null;
 
         private DataBaseController DataBaseController = null;
@@ -111,6 +111,14 @@ namespace PingPongScout
         public MainWindow()
         {
             InitializeComponent();
+            WindowState = cameraView == CameraType.None ? WindowState.Minimized : WindowState.Maximized;
+            if (cameraView == CameraType.Skeletal)
+            {
+                Height = 1920;
+                Width = 1080;
+                grid.Height = 1920;
+                grid.Width = 1080; 
+            }
         }
 
         #endregion
@@ -173,7 +181,7 @@ namespace PingPongScout
 
                                 if (cameraView == (int)CameraType.BodyIndex)
                                 {
-                                    camera.Source = DepthExtensions.ToBitmap(depthFrame, bodyIndexFrame);       // Looks like the Predator. Not needed Modularized version refactor.
+                                    camera.Source = DepthExtensions.ToBitmap(depthFrame, bodyIndexFrame);       // Looks like the Predator.
                                 }
                             }
                         }
@@ -202,7 +210,7 @@ namespace PingPongScout
                             }
                         }
 
-                        if (cameraView == (int)CameraType.Infrared)
+                        if (cameraView == CameraType.Infrared)
                         {
                             camera.Source = InfraredExtensions.ToBitmap(infraredFrame);
                         }
@@ -214,6 +222,7 @@ namespace PingPongScout
                 {
                     if (bodyFrame != null)
                     {
+                        canvas.Children.Clear();
                         bodyFrame.GetAndRefreshBodyData(_bodyData);
                         timeStamp = bodyFrame.RelativeTime;
 
@@ -224,7 +233,7 @@ namespace PingPongScout
                         var trackedBodies = new KeyValuePair<TimeSpan, IList<BodyWrapper>>(timeStamp, bodyDataList);
                         DataBaseController.GetVitruviusData(trackedBodies);
 
-                        if (cameraView == (int)CameraType.Skeletal)
+                        if (cameraView == CameraType.Skeletal)
                         {
                             // Foreach 2: Draw Joint to canvas
                             foreach (BodyWrapper bodyWrapper in bodyDataList)
@@ -248,7 +257,7 @@ namespace PingPongScout
                                         Canvas.SetLeft(ellipse, (colorPoint.X - ellipse.Width / 2));
                                         Canvas.SetTop(ellipse, (colorPoint.Y - ellipse.Width / 2));
 
-                                        canvas.Children.Add(ellipse);                                   // Not needed Modularized version refactor.
+                                        canvas.Children.Add(ellipse);
                                     }
                                 }
                             }

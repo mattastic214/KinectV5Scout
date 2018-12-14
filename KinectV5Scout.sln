@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2041
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28407.52
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PingPongScout", "PingPongScout\PingPongScout.csproj", "{9E2A3524-38C1-46B8-9E11-462E9D8FE3E7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BallDetection", "BallDetection\BallDetection.csproj", "{61F9E6E2-F26C-46EA-88BF-DA4A76D2D150}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectConstantsBGRA", "KinectConstantsBGRA\KinectConstantsBGRA.csproj", "{ADB994E7-CE6B-4670-8609-4C38730613DF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProjectionInterface", "ProjectionInterface\ProjectionInterface.csproj", "{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectDataBase", "KinectDataBase\KinectDataBase.csproj", "{487A8C49-C902-4EC1-BC66-C00EF83C1D3A}"
 EndProject
@@ -47,14 +45,6 @@ Global
 		{ADB994E7-CE6B-4670-8609-4C38730613DF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{ADB994E7-CE6B-4670-8609-4C38730613DF}.Release|x64.ActiveCfg = Release|Any CPU
 		{ADB994E7-CE6B-4670-8609-4C38730613DF}.Release|x64.Build.0 = Release|Any CPU
-		{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}.Debug|x64.Build.0 = Debug|Any CPU
-		{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}.Release|x64.ActiveCfg = Release|Any CPU
-		{45BE4D94-645B-4234-AA2B-F18B6B52F2A0}.Release|x64.Build.0 = Release|Any CPU
 		{487A8C49-C902-4EC1-BC66-C00EF83C1D3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{487A8C49-C902-4EC1-BC66-C00EF83C1D3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{487A8C49-C902-4EC1-BC66-C00EF83C1D3A}.Debug|x64.ActiveCfg = Debug|Any CPU

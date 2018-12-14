@@ -6,6 +6,8 @@ namespace KinectDataBase
 {
     public class DataBaseController : IController
     {
+        private string basePath = @"..\..\..\KinectDataBase\KinectDataOutput\";
+        private string[] paths = { "Vitruvius.txt", "BodyIndex.txt", "DepthData.txt", "InfraredData.txt", "LongExposure.txt" };
 
         public DataBaseAccess DataBaseAccess = null;
 
@@ -14,29 +16,29 @@ namespace KinectDataBase
             DataBaseAccess = new DataBaseAccess();
         }
 
-        public void GetBodyIndexData(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData)
+        public async void GetBodyIndexData(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData)
         {
-            DataBaseAccess.WriteBodyIndexDataToDataBase(bodyIndexData);
+            await DataBaseAccess.WriteBodyIndexDataToDataBase(bodyIndexData);
         }
 
-        public void GetDepthData(KeyValuePair<TimeSpan, ushort[]> depthData)
+        public async void GetDepthData(KeyValuePair<TimeSpan, ushort[]> depthData)
         {
-            DataBaseAccess.WriteDepthDataToDataBase(depthData);
+            await DataBaseAccess.WriteDepthDataToDataBase(depthData);
         }
 
-        public void GetInfraredData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData)
+        public async void GetInfraredData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData)
         {
-            DataBaseAccess.WriteInfraredDataToDataBase(infraredData);
+            await DataBaseAccess.WriteInfraredDataToDataBase(infraredData);
         }
 
-        public void GetLongExposureData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData)
+        public async void GetLongExposureData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData)
         {
-            DataBaseAccess.WriteLongExposureDataToDataBase(longExposureData);
+            await DataBaseAccess.WriteLongExposureDataToDataBase(longExposureData);
         }
 
-        public void GetVitruviusData(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapper)
+        public async void GetVitruviusData(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapper)
         {
-            DataBaseAccess.WriteVitruviusToDataBase(bodyWrapper);
+            await DataBaseAccess.WriteVitruviusToDataBase(bodyWrapper);
         }
     }
 }
