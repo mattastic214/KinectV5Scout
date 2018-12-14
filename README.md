@@ -3,10 +3,10 @@ A Kinect Camera application to analyze body movement.
 
 
 ## Contents:
-[Overview](#overview)
-[Main Window](#main-window)
-[Kinect Database](#kinect-database)
-[Kinect Constants BGRA](kinect-constants-bgra)
+[Overview](#overview)  
+[Main Window](#main-window)  
+[Kinect Database](#kinect-database)  
+[Kinect Constants BGRA](kinect-constants-bgra)  
 
 # Overview
 The intended purposes of this application are:
