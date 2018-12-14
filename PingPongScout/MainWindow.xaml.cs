@@ -14,14 +14,6 @@ using System.Windows.Controls;
 
 namespace PingPongScout
 {
-    enum CameraType
-    {
-        BodyIndex,
-        Infrared,
-        Skeletal,
-        None
-    };
-
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// DepthFrame
@@ -269,4 +261,12 @@ namespace PingPongScout
 
         #endregion
     }
+
+    enum CameraType
+    {
+        BodyIndex,
+        Infrared,
+        Skeletal,
+        None
+    };
 }
