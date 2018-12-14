@@ -10,7 +10,7 @@ A Kinect Camera application to analyze body movement.
 
 ## Features
 ### Track movement data of up to six people
-### Store the tracked data to disk
+### Store tracking data to disk
 ### Record camera stream to disk
 - _BodyIndex (Kinectv2 Reference)_
 - _Infrared_
