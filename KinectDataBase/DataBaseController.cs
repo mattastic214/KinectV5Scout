@@ -1,14 +1,13 @@
 ﻿using LightBuzz.Vitruvius;
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace KinectDataBase
 {
     public class DataBaseController : IController
     {
-        private string basePath = @"..\..\..\KinectDataBase\KinectDataOutput\";
-        private string[] paths = { "Vitruvius.txt", "BodyIndex.txt", "DepthData.txt", "InfraredData.txt", "LongExposure.txt" };
-
         public DataBaseAccess DataBaseAccess = null;
 
         public DataBaseController()
@@ -16,29 +15,29 @@ namespace KinectDataBase
             DataBaseAccess = new DataBaseAccess();
         }
 
-        public async void GetBodyIndexData(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData)
+        public Task GetBodyIndexData(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData, CancellationToken token)
         {
-            await DataBaseAccess.WriteBodyIndexDataToDataBase(bodyIndexData);
+            return DataBaseAccess.WriteBodyIndexDataToDataBase(bodyIndexData, token);
         }
 
-        public async void GetDepthData(KeyValuePair<TimeSpan, ushort[]> depthData)
+        public Task GetDepthData(KeyValuePair<TimeSpan, ushort[]> depthData, CancellationToken token)
         {
-            await DataBaseAccess.WriteDepthDataToDataBase(depthData);
+            return DataBaseAccess.WriteDepthDataToDataBase(depthData, token);
         }
 
-        public async void GetInfraredData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData)
+        public Task GetInfraredData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData, CancellationToken token)
         {
-            await DataBaseAccess.WriteInfraredDataToDataBase(infraredData);
+            return DataBaseAccess.WriteInfraredDataToDataBase(infraredData, token);
         }
 
-        public async void GetLongExposureData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData)
+        public Task GetLongExposureData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData, CancellationToken token)
         {
-            await DataBaseAccess.WriteLongExposureDataToDataBase(longExposureData);
+            return DataBaseAccess.WriteLongExposureDataToDataBase(longExposureData, token);
         }
 
-        public async void GetVitruviusData(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapper)
+        public Task GetVitruviusData(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapper, CancellationToken token)
         {
-            await DataBaseAccess.WriteVitruviusToDataBase(bodyWrapper);
+            return DataBaseAccess.WriteVitruviusToDataBase(bodyWrapper, token);
         }
     }
 }

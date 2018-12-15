@@ -5,6 +5,7 @@ using Microsoft.Kinect;
 using LightBuzz.Vitruvius;
 using System.Threading.Tasks;
 using LightBuzz.Vitruvius.Controls; // Use for KinectViewer. What does it do?
+using System.Threading;
 using System.Linq;
 using KinectDataBase;
 using KinectConstantsBGRA;
@@ -14,6 +15,13 @@ using System.Windows.Controls;
 
 namespace PingPongScout
 {
+    enum CameraType
+    {
+        BodyIndex,
+        Infrared,
+        Skeletal,
+        None
+    };
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// DepthFrame
@@ -25,8 +33,17 @@ namespace PingPongScout
 
         #region Members
 
-        readonly CameraType cameraView = CameraType.Skeletal;
+        readonly CameraType cameraView = CameraType.BodyIndex;
         //private VitruviusRecorder VitruviusRecorder = null;
+
+        Task depthTask = null;
+        Task infraredTask = null;
+        Task bodyIndexTask = null;
+        Task longExpTask = null;
+        Task vitruviusTask = null;
+        Task bodyBitMapUpdateTask = null;
+        // Task[] taskArray = new Task[6];
+        private CancellationTokenSource tokenSource = null;
 
         private DataBaseController DataBaseController = null;
         private TimeSpan timeStamp;
@@ -145,13 +162,16 @@ namespace PingPongScout
             }
         }
 
-        private void MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
+        private async void MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
         {
             MultiSourceFrame reference = e.FrameReference.AcquireFrame();
 
             // COORDINATE MAPPING
             if (reference != null )
-            {                
+            {
+                tokenSource = new CancellationTokenSource();
+                CancellationToken token = tokenSource.Token;
+
                 using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
                 {
                     // 1a. Infrared and Object Depth Tracking.
@@ -162,16 +182,18 @@ namespace PingPongScout
 
                         _depthData = _depthBitmapGenerator.DepthData;
 
-                        DataBaseController.GetDepthData(new KeyValuePair<TimeSpan, ushort[]>(timeStamp, _depthData));
+                        depthTask = DataBaseController.GetDepthData(new KeyValuePair<TimeSpan, ushort[]>(timeStamp, _depthData), token);
 
                         using (var bodyIndexFrame = reference.BodyIndexFrameReference.AcquireFrame())
                         {
                             if (bodyIndexFrame != null)
                             {
+                                // _depthBitmapGenerator is very taxing on the CPU, delegate to another task.
                                 _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
-                                DataBaseController.GetBodyIndexData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator));
 
-                                if (cameraView == (int)CameraType.BodyIndex)
+                                bodyIndexTask = DataBaseController.GetBodyIndexData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator), token);
+
+                                if (cameraView == CameraType.BodyIndex)
                                 {
                                     camera.Source = DepthExtensions.ToBitmap(depthFrame, bodyIndexFrame);       // Looks like the Predator.
                                 }
@@ -190,7 +212,7 @@ namespace PingPongScout
 
                         _infraredBitmapGenerator.Update(infraredFrame);
 
-                        DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));
+                        infraredTask = DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator), token);
 
                         using (var longExposureFrame = reference.LongExposureInfraredFrameReference.AcquireFrame())
                         {
@@ -198,7 +220,7 @@ namespace PingPongScout
                             {
                                 _infraredBitmapGenerator.Update(infraredFrame);
 
-                                DataBaseController.GetLongExposureData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator));
+                                longExpTask = DataBaseController.GetLongExposureData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator), token);
                             }
                         }
 
@@ -223,7 +245,7 @@ namespace PingPongScout
                                                     .ToList();
 
                         var trackedBodies = new KeyValuePair<TimeSpan, IList<BodyWrapper>>(timeStamp, bodyDataList);
-                        DataBaseController.GetVitruviusData(trackedBodies);
+                        vitruviusTask = DataBaseController.GetVitruviusData(trackedBodies, token);
 
                         if (cameraView == CameraType.Skeletal)
                         {
@@ -256,17 +278,23 @@ namespace PingPongScout
                         }
                     }
                 }
+
+                try
+                {
+                    if (depthTask != null) { await depthTask; }
+                    if (infraredTask != null) { await infraredTask; }
+                    if (bodyBitMapUpdateTask != null) { await bodyBitMapUpdateTask; }
+                    if (bodyIndexTask != null) { await bodyIndexTask; }
+                    if (longExpTask != null) { await longExpTask; }
+                    if (vitruviusTask != null) { await vitruviusTask; }
+                }
+                catch (OperationCanceledException oce)
+                {
+                    Console.WriteLine(oce.Message);
+                }
             }
         }
 
         #endregion
     }
-
-    enum CameraType
-    {
-        BodyIndex,
-        Infrared,
-        Skeletal,
-        None
-    };
 }

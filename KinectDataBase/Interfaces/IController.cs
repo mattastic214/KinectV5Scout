@@ -1,19 +1,21 @@
 ﻿using LightBuzz.Vitruvius;
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace KinectDataBase
 {
     public interface IController
     {
-        void GetBodyIndexData(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData);
+        Task GetBodyIndexData(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData, CancellationToken token);
 
-        void GetDepthData(KeyValuePair<TimeSpan, ushort[]> depthData);
+        Task GetDepthData(KeyValuePair<TimeSpan, ushort[]> depthData, CancellationToken token);
 
-        void GetInfraredData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData);
+        Task GetInfraredData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData, CancellationToken token);
 
-        void GetLongExposureData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData);
+        Task GetLongExposureData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData, CancellationToken token);
 
-        void GetVitruviusData(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapper);
+        Task GetVitruviusData(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapper, CancellationToken token);
     }
 }
