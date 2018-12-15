@@ -1,0 +1,34 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace KinectDataBase
+{
+    public class DataBaseConstants
+    {
+        #region Constants
+
+        // private readonly string basePath = @"..\..\..\KinectDataBase\KinectDataOutput\";
+        public string BasePath { get; } = @"..\..\..\KinectDataBase\KinectDataOutput\";
+        public string bodyIndexPath { get; } = @"BodyIndex.txt";
+        public string depthDataPath { get; } = @"DepthData.txt";
+        public string infraredDataPath { get; } = @"InfraredData.txt";
+        public string longExposureDataPath { get; } = @"LongExposureData.txt";
+        public string vitruviusPath { get; } = @"Vitruvius.txt";
+
+        public readonly List<string> dbConstants = new List<string>();
+
+        public DataBaseConstants()
+        {
+            dbConstants.Add(bodyIndexPath);
+            dbConstants.Add(depthDataPath);
+            dbConstants.Add(infraredDataPath);
+            dbConstants.Add(longExposureDataPath);
+            dbConstants.Add(vitruviusPath);
+        }
+
+        #endregion
+    }
+}

@@ -21,12 +21,6 @@ namespace KinectDataBase
          *
         **/
         
-        private string basePath = @"..\..\..\KinectDataBase\KinectDataOutput\";
-        private string bodyIndexPath = @"BodyIndex.txt";
-        private string depthDataPath = @"DepthData.txt";
-        private string infraredDataPath = @"InfraredData.txt";
-        private string longExposureDataPath = @"LongExposureData.txt";
-        private string vitruviusPath = @"Vitruvius.txt";
         private readonly object fileLock = new object();
         private readonly object bodyLock = new object();
         StringBuilder sb = new StringBuilder();
@@ -34,7 +28,7 @@ namespace KinectDataBase
         private int i;
         private Random random = new Random();
 
-        public Task WriteBodyIndexDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData, CancellationToken token)
+        public Task WriteBodyIndexDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData, CancellationToken token, string path)
         {
             i = random.Next(0, (int)Math.Pow(2, 16) - 1);
 
@@ -42,11 +36,11 @@ namespace KinectDataBase
             {
                 lock (fileLock)
                 {
-                    using (StreamWriter str = File.AppendText(basePath + bodyIndexPath))
+                    using (StreamWriter str = File.AppendText(path))
                     {
                         // var path = "BodyIndex.txt";
                         str.WriteLine("Depth data (ushort): " + bodyIndexData.Key + ", Value: " + bodyIndexData.Value.DepthData.GetValue(i) + "\n");
-                        bodyIndexData.Value.Bitmap.Save(basePath);
+                        //bodyIndexData.Value.Bitmap.Save(basePath);
                     }
                 }
             }, token);
@@ -54,7 +48,7 @@ namespace KinectDataBase
             return t;
         }
 
-        public Task WriteDepthDataToDataBase(KeyValuePair<TimeSpan, ushort[]> depthData, CancellationToken token)
+        public Task WriteDepthDataToDataBase(KeyValuePair<TimeSpan, ushort[]> depthData, CancellationToken token, string path)
         {
             i = random.Next(0, (int)Math.Pow(2, 16) - 1);
 
@@ -62,7 +56,7 @@ namespace KinectDataBase
             {
                 lock (fileLock)
                 {
-                    using (StreamWriter str = File.AppendText(basePath + depthDataPath))
+                    using (StreamWriter str = File.AppendText(path))
                     {
                         str.WriteLine("Depth data (ushort): " + depthData.Key + ", Value: " + depthData.Value[i] + "\n");
                         // return depthData.Value != null;
@@ -73,13 +67,13 @@ namespace KinectDataBase
             return t;
         }
 
-        public Task WriteInfraredDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData, CancellationToken token)
+        public Task WriteInfraredDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData, CancellationToken token, string path)
         {
             Task t = Task.Run(() =>
             {
                 lock (fileLock)
                 {
-                    using (StreamWriter str = File.AppendText(basePath + infraredDataPath))
+                    using (StreamWriter str = File.AppendText(path))
                     {
                         str.WriteLine("BodyFrameIndex Depth data (ushort): " + infraredData.Key + ", Value: " + infraredData.Value.InfraredData.FirstOrDefault() + "\n");
                         // return infraredData.Value != null;
@@ -90,13 +84,13 @@ namespace KinectDataBase
             return t;
         }
 
-        public Task WriteLongExposureDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData, CancellationToken token)
+        public Task WriteLongExposureDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData, CancellationToken token, string path)
         {
             Task t = Task.Run(() =>
             {
                 lock (fileLock)
                 {
-                    using (StreamWriter str = File.AppendText(basePath + longExposureDataPath))
+                    using (StreamWriter str = File.AppendText(path))
                     {
                         str.WriteLine("BodyFrameIndex Depth data (ushort): " + longExposureData.Key + ", Value: " + longExposureData.Value + "\n");
                         return longExposureData.Value != null;
@@ -115,7 +109,7 @@ namespace KinectDataBase
         // 3. When the file system has opened and read the file, the server returns the content to the client.
         // Node.js eliminates the waiting, and simply continues with the next request.
         // Node.js runs single-threaded, non-blocking, asynchronously programming, which is very memory efficient.
-        public Task WriteVitruviusToDataBase(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapperList, CancellationToken token)
+        public Task WriteVitruviusToDataBase(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapperList, CancellationToken token, string path)
         {
             // IList<BodyWrapper> bodyList = bodyWrapperList.Value;
             BodyWrapper body = bodyWrapperList.Value.FirstOrDefault();
@@ -125,7 +119,7 @@ namespace KinectDataBase
             {
                 lock (fileLock)
                 {
-                    using (StreamWriter str = File.AppendText(basePath + vitruviusPath))
+                    using (StreamWriter str = File.AppendText(path))
                     using (StringWriter strwtr = new StringWriter(sb))
                     using (JsonTextWriter writer = new JsonTextWriter(strwtr))
                     {
@@ -140,6 +134,7 @@ namespace KinectDataBase
                         str.WriteLine(sb.ToString());
                         sb.Clear();
 
+                        // Async could work if the sb.Clear(); were made to be Async as well with a group of the write functions.
                         //writer.WriteRawAsync(body.ToJSON());
                         //writer.WriteEndObjectAsync();
                         //str.WriteLineAsync(sb.ToString());

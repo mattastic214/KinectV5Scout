@@ -76,6 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataBaseAccess.cs" />
+    <Compile Include="DataBaseConstants.cs" />
     <Compile Include="DataBaseModel.cs" />
     <Compile Include="Interfaces\IApplyKey.cs" />
     <Compile Include="Interfaces\IDataBaseAccess.cs" />
