@@ -9,7 +9,7 @@ A Kinect Camera application to analyze body movement.
 [Kinect Constants BGRA](kinect-constants-bgra)  
 
 ## Features
-### Track movement data of up to six people
+### Track movement data of default found person (developing for 6)
 ### Store tracking data to disk
 ### Record camera stream to disk
 - _BodyIndex (Kinectv2 Reference)_
