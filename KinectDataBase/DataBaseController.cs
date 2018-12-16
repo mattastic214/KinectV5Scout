@@ -11,14 +11,14 @@ namespace KinectDataBase
     public class DataBaseController : IController
     {
         public DataBaseAccess DataBaseAccess = null;
-        public DataBaseConstants DataBaseConstants { get; } = null;
+        private DataBaseConstants DataBaseConstants { get; } = null;
 
         public DataBaseController()
         {
             DataBaseAccess = new DataBaseAccess();
             DataBaseConstants = new DataBaseConstants();
-            
-            foreach(string file in DataBaseConstants.dbConstants)
+
+            foreach (string file in DataBaseConstants.dbConstants)
             {
                 if (File.Exists(DataBaseConstants.BasePath + file))
                 {

@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Kinect;
-using LightBuzz.Vitruvius;
 
 
 namespace BallDetection

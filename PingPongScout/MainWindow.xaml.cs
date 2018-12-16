@@ -2,8 +2,8 @@
 using System.Windows;
 using System.Collections.Generic;
 using Microsoft.Kinect;
-using LightBuzz.Vitruvius;
 using System.Threading.Tasks;
+using LightBuzz.Vitruvius;
 using LightBuzz.Vitruvius.Controls; // Use for KinectViewer. What does it do?
 using System.Threading;
 using System.Linq;
@@ -17,9 +17,9 @@ namespace PingPongScout
 {
     enum CameraType
     {
+        Skeletal,
         BodyIndex,
         Infrared,
-        Skeletal,
         None
     };
     /// <summary>
@@ -34,7 +34,7 @@ namespace PingPongScout
         #region Members
 
         readonly CameraType cameraView = CameraType.BodyIndex;
-        //private VitruviusRecorder VitruviusRecorder = null;
+        //private VideoRecorder videoRecorder = new VideoRecorder();
 
         Task depthTask = null;
         Task infraredTask = null;
@@ -51,6 +51,7 @@ namespace PingPongScout
         //private KinectViewer _kinectViewer = null;                  // What use is this??
         private MultiSourceFrameReader _multiSourceFrameReader = null;
         private CoordinateMapper _coordinateMapper = null;
+
 
         private InfraredBitmapGenerator _infraredBitmapGenerator = null;
         private DepthBitmapGenerator _depthBitmapGenerator = null;
@@ -236,7 +237,7 @@ namespace PingPongScout
                 {
                     if (bodyFrame != null)
                     {
-                        canvas.Children.Clear();
+                        //canvas.Children.Clear();
                         bodyFrame.GetAndRefreshBodyData(_bodyData);
                         timeStamp = bodyFrame.RelativeTime;
 
@@ -254,25 +255,26 @@ namespace PingPongScout
                             {
                                 if (bodyWrapper.IsTracked)
                                 {
-                                    var trackedJoints = bodyWrapper.TrackedJoints(false);
+                                    //var trackedJoints = bodyWrapper.TrackedJoints(false);
 
-                                    foreach (Joint joint in trackedJoints)
-                                    {
-                                        DepthSpacePoint depthPoint = _kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(joint.Position);
-                                        ColorSpacePoint colorPoint = _kinectSensor.CoordinateMapper.MapCameraPointToColorSpace(joint.Position);
+                                    //foreach (Joint joint in trackedJoints)
+                                    //{
+                                    //    DepthSpacePoint depthPoint = _kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(joint.Position);
+                                    //    ColorSpacePoint colorPoint = _kinectSensor.CoordinateMapper.MapCameraPointToColorSpace(joint.Position);
 
-                                        Ellipse ellipse = new Ellipse
-                                        {
-                                            Fill = Brushes.Red,
-                                            Width = 30,
-                                            Height = 30
-                                        };
+                                    //    Ellipse ellipse = new Ellipse
+                                    //    {
+                                    //        Fill = Brushes.Red,
+                                    //        Width = 30,
+                                    //        Height = 30
+                                    //    };
 
-                                        Canvas.SetLeft(ellipse, (colorPoint.X - ellipse.Width / 2));
-                                        Canvas.SetTop(ellipse, (colorPoint.Y - ellipse.Width / 2));
+                                    //    Canvas.SetLeft(ellipse, (colorPoint.X - ellipse.Width / 2));
+                                    //    Canvas.SetTop(ellipse, (colorPoint.Y - ellipse.Width / 2));
 
-                                        canvas.Children.Add(ellipse);
-                                    }
+                                    //    canvas.Children.Add(ellipse);
+                                    //}
+                                    
                                 }
                             }
                         }

@@ -11,19 +11,10 @@ using System.Threading.Tasks;
 namespace KinectDataBase
 {
     public class DataBaseAccess : IDataBaseAccess
-    {
-        /**
-         * Multithreading problems:
-         * The string variables exist in state in the scope of 'this' {KinectDatabase.DatabaseAccess}
-         * However, a created thread 'Task' holds access to the variables basePath and 'bodyIndexPath.txt'
-         * or whichever file .txt it would need at the time. DataBaseAccess should not control state.
-         * State should be passed down from a layer that manages state to lower layers.
-         *
-        **/
-        
+    {        
         private readonly object fileLock = new object();
         private readonly object bodyLock = new object();
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();             // Make StringBuilder an IDisposable
 
         private int i;
         private Random random = new Random();
@@ -112,7 +103,7 @@ namespace KinectDataBase
         public Task WriteVitruviusToDataBase(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapperList, CancellationToken token, string path)
         {
             // IList<BodyWrapper> bodyList = bodyWrapperList.Value;
-            BodyWrapper body = bodyWrapperList.Value.FirstOrDefault();
+            BodyWrapper body = bodyWrapperList.Value.Closest();
             TimeSpan time = bodyWrapperList.Key;
 
             Task t = Task.Run(() =>
@@ -129,9 +120,13 @@ namespace KinectDataBase
 
                         writer.WritePropertyName("TrackedPlayer");
 
-                        writer.WriteRaw(body.ToJSON());
+                        if (body != null)
+                        {
+                            writer.WriteRaw(body.ToJSON());
+                        }
+                        
                         writer.WriteEndObject();
-                        str.WriteLine(sb.ToString());
+                        str.Write(sb.ToString());
                         sb.Clear();
 
                         // Async could work if the sb.Clear(); were made to be Async as well with a group of the write functions.

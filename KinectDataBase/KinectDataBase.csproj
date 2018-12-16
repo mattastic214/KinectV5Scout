@@ -41,7 +41,7 @@
       <HintPath>..\packages\EntityFramework6.Npgsql.3.2.0\lib\net45\EntityFramework6.Npgsql.dll</HintPath>
     </Reference>
     <Reference Include="LightBuzz.Vitruvius">
-      <HintPath>..\..\..\assemblies\Vitruvius_(Premium)\LightBuzz.Vitruvius.5.0.1\LightBuzz.Vitruvius.4.5.0-Legacy\Assemblies\WPF\LightBuzz.Vitruvius.dll</HintPath>
+      <HintPath>..\..\..\assemblies\Vitruvius_(Premium)5.0.5\LightBuzz.Vitruvius.5.0.5\LightBuzz.Vitruvius.4.5.0-Legacy\Assemblies\WPF\LightBuzz.Vitruvius.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Kinect, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -77,7 +77,6 @@
   <ItemGroup>
     <Compile Include="DataBaseAccess.cs" />
     <Compile Include="DataBaseConstants.cs" />
-    <Compile Include="DataBaseModel.cs" />
     <Compile Include="Interfaces\IApplyKey.cs" />
     <Compile Include="Interfaces\IDataBaseAccess.cs" />
     <Compile Include="DataBaseController.cs" />

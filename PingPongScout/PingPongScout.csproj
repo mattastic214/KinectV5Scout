@@ -62,10 +62,11 @@
       <HintPath>..\..\..\assemblies\emgucv-windesktop 3.4.1.2976\bin\Emgu.CV.World.dll</HintPath>
     </Reference>
     <Reference Include="LightBuzz.Vitruvius">
-      <HintPath>..\..\..\..\libraries\Vitruvius_(Premium)\LightBuzz.Vitruvius.5.0.1\LightBuzz.Vitruvius.4.5.0-Legacy\Assemblies\WPF\LightBuzz.Vitruvius.dll</HintPath>
+      <HintPath>..\..\..\assemblies\Vitruvius_(Premium)5.0.5\LightBuzz.Vitruvius.5.0.5\LightBuzz.Vitruvius.4.5.0-Legacy\Assemblies\WPF\LightBuzz.Vitruvius.dll</HintPath>
     </Reference>
-    <Reference Include="LightBuzz.Vitruvius.Controls">
-      <HintPath>..\..\..\..\libraries\Vitruvius_(Premium)\LightBuzz.Vitruvius.5.0.1\LightBuzz.Vitruvius.4.5.0-Legacy\Assemblies\WPF\LightBuzz.Vitruvius.Controls.dll</HintPath>
+    <Reference Include="LightBuzz.Vitruvius.Controls, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\assemblies\Vitruvius_(Premium)5.0.5\LightBuzz.Vitruvius.5.0.5\LightBuzz.Vitruvius.4.5.0-Legacy\Assemblies\WPF\LightBuzz.Vitruvius.Controls.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Kinect, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System" />
@@ -173,6 +174,9 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="SampleData\Vitruvius.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
