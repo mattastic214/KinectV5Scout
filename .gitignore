@@ -3,6 +3,7 @@
 
 KinectDataBase/KinectDataOutput/
 Diagnostics/
+SampleData/
 
 # User-specific files
 *.suo
