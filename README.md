@@ -1,5 +1,6 @@
 # KinectV5Scout
-A Kinect Camera application to analyze body movement. This project leverages asynchronous and event-driven programming concepts.
+A Kinect Camera application to analyze body movement.  
+This project leverages asynchronous and event-driven programming concepts.
 
 
 ## Contents:
