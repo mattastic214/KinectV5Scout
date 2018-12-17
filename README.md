@@ -1,5 +1,5 @@
 # KinectV5Scout
-A Kinect Camera application to analyze body movement.
+A Kinect Camera application to analyze body movement. This project leverages asynchronous and event-driven programming concepts.
 
 
 ## Contents:
@@ -17,8 +17,15 @@ A Kinect Camera application to analyze body movement.
 - _Skeletal, against a black background_
 
 ## Main Window
-The MainWindow.xaml and its child MainWindow.xaml.cs contain the presentation XAML and C# logic, respectively, to handle and present camera frames from the Kinect camera.
+Contains the presentation XAML and C# logic to handle and present camera frames from the Kinect camera.
 
 ## Kinect Database
+A library that fetches frame data from the Main Window camera stream and stores it to disk.
+
+- _DatabaseController_  
+Fetches frame data from the camera stream  
+
+- _DataBaseAccess_  
+Writes data to file/disk  
 
 ## Kinect Constants BGRA
