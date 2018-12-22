@@ -39,7 +39,7 @@ namespace KinectDataBase
             return t;
         }
 
-        public Task WriteDepthDataToDataBase(KeyValuePair<TimeSpan, ushort[]> depthData, CancellationToken token, string path)
+        public Task WriteDepthDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> depthData, CancellationToken token, string path)
         {
             i = random.Next(0, (int)Math.Pow(2, 16) - 1);
 
@@ -49,7 +49,7 @@ namespace KinectDataBase
                 {
                     using (StreamWriter str = File.AppendText(path))
                     {
-                        str.WriteLine("Depth data (ushort): " + depthData.Key + ", Value: " + depthData.Value[i] + "\n");
+                        str.WriteLine("Depth data (ushort): " + depthData.Key + ", Value: " + depthData.Value.DepthData.GetValue(i) + "\n");
                         // return depthData.Value != null;
                     }
                 }

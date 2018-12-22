@@ -58,7 +58,7 @@ namespace UnitTest
         #endregion
 
         [Test]
-        public void TestMethod1()
+        public void GetDataAndToken_ReturnTask()
         {
             //
             // TODO: Add test logic here

@@ -10,7 +10,7 @@ namespace KinectDataBase
 {
     public interface IDataBaseAccess
     {
-        Task WriteDepthDataToDataBase(KeyValuePair<TimeSpan, ushort[]> depthData, CancellationToken token, string path);
+        Task WriteDepthDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> depthData, CancellationToken token, string path);
 
         Task WriteInfraredDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData, CancellationToken token, string path);
 

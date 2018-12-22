@@ -77,10 +77,15 @@
   <ItemGroup>
     <Compile Include="DataBaseAccess.cs" />
     <Compile Include="DataBaseConstants.cs" />
-    <Compile Include="Interfaces\IApplyKey.cs" />
-    <Compile Include="Interfaces\IDataBaseAccess.cs" />
+    <Compile Include="DataBaseService.cs" />
+    <Compile Include="Interfaces\Controllers\IBodyIndexController.cs" />
+    <Compile Include="Interfaces\Controllers\IDepthDataController.cs" />
+    <Compile Include="Interfaces\Controllers\IInfraredDataController.cs" />
+    <Compile Include="Interfaces\Controllers\IJsonController.cs" />
+    <Compile Include="Interfaces\Controllers\ILongExposureController.cs" />
+    <Compile Include="Interfaces\Service\IApplyKey.cs" />
+    <Compile Include="Interfaces\Access\IDataBaseAccess.cs" />
     <Compile Include="DataBaseController.cs" />
-    <Compile Include="Interfaces\IController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -103,10 +108,6 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interfaces\Access\" />
-    <Folder Include="Interfaces\Controllers\" />
-    <Folder Include="Interfaces\Keys\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
