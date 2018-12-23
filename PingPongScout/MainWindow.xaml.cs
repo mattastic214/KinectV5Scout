@@ -175,7 +175,6 @@ namespace PingPongScout
 
                 using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
                 {
-                    // 1a. Infrared and Object Depth Tracking.
                     if (depthFrame != null)
                     {
                         timeStamp = depthFrame.RelativeTime;
@@ -193,7 +192,7 @@ namespace PingPongScout
 
                                 if (cameraView == CameraType.BodyIndex)
                                 {
-                                    camera.Source = DepthExtensions.ToBitmap(depthFrame, bodyIndexFrame);       // Looks like the Predator.
+                                    camera.Source = DepthExtensions.ToBitmap(depthFrame, bodyIndexFrame);
                                 }
                             }
                         }
@@ -202,8 +201,6 @@ namespace PingPongScout
 
                 using (var infraredFrame = reference.InfraredFrameReference.AcquireFrame())
                 {
-                    // 1b. Infrared and Object Depth Tracking.
-                    // 3. LongExposure Frame Tracking (Infrared)
                     if (infraredFrame != null)
                     {
                         timeStamp = infraredFrame.RelativeTime;
@@ -227,50 +224,24 @@ namespace PingPongScout
                     }
                 }
 
-                // 4. Vitruvius Body Wrapper Tracking
                 using (var bodyFrame = reference.BodyFrameReference.AcquireFrame())
                 {
                     if (bodyFrame != null)
                     {
-                        //canvas.Children.Clear();
                         bodyFrame.GetAndRefreshBodyData(_bodyData);
                         timeStamp = bodyFrame.RelativeTime;
 
-                        var bodyDataList = _bodyData.Where(b => b.IsTracked)
-                                                    .Select(b => BodyWrapper.Create(b, _coordinateMapper, Visualization.Infrared))
-                                                    .ToList();
+                        //var bodyDataList = _bodyData.Where(b => b.IsTracked)
+                        //                            .Select(b => BodyWrapper.Create(b, _coordinateMapper, Visualization.Infrared))
+                        //                            .ToList();
+                        //vitruviusTask = DataBaseController.GetVitruviusData(new KeyValuePair<TimeSpan, IList<BodyWrapper>>(timeStamp, bodyDataList), token);
 
-                        vitruviusTask = DataBaseController.GetVitruviusData(new KeyValuePair<TimeSpan, IList<BodyWrapper>>(timeStamp, bodyDataList), token);
+                        var bodyData = BodyWrapper.Create(_bodyData.Closest(), _coordinateMapper, Visualization.Infrared);
+                        vitruviusTask = DataBaseController.GetVitruviusSingleData(new KeyValuePair<TimeSpan, BodyWrapper>(timeStamp, bodyData), token);
 
                         if (cameraView == CameraType.Skeletal)
                         {
-                            // Foreach 2: Draw Joint to canvas
-                            foreach (BodyWrapper bodyWrapper in bodyDataList)
-                            {
-                                if (bodyWrapper.IsTracked)
-                                {
-                                    //var trackedJoints = bodyWrapper.TrackedJoints(false);
-
-                                    //foreach (Joint joint in trackedJoints)
-                                    //{
-                                    //    DepthSpacePoint depthPoint = _kinectSensor.CoordinateMapper.MapCameraPointToDepthSpace(joint.Position);
-                                    //    ColorSpacePoint colorPoint = _kinectSensor.CoordinateMapper.MapCameraPointToColorSpace(joint.Position);
-
-                                    //    Ellipse ellipse = new Ellipse
-                                    //    {
-                                    //        Fill = Brushes.Red,
-                                    //        Width = 30,
-                                    //        Height = 30
-                                    //    };
-
-                                    //    Canvas.SetLeft(ellipse, (colorPoint.X - ellipse.Width / 2));
-                                    //    Canvas.SetTop(ellipse, (colorPoint.Y - ellipse.Width / 2));
-
-                                    //    canvas.Children.Add(ellipse);
-                                    //}
-                                    
-                                }
-                            }
+                            Console.WriteLine("All your bases are belong to us.");
                         }
                     }
                 }

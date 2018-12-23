@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using LightBuzz.Vitruvius;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 
-namespace KinectDataBase
+namespace KinectDataBase.Interfaces.Access
 {
     public interface IDataBaseAccess
     {
@@ -18,6 +16,5 @@ namespace KinectDataBase
 
         Task WriteBodyIndexDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData, CancellationToken token, string path);
 
-        Task WriteVitruviusToDataBase(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapper, CancellationToken token, string path);
     }
 }

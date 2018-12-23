@@ -6,7 +6,6 @@ namespace KinectDataBase
     {
         #region Constants
 
-        // private readonly string basePath = @"..\..\..\KinectDataBase\KinectDataOutput\";
         public string BasePath { get; } = @"..\..\..\KinectDataBase\KinectDataOutput\";
         public string bodyIndexPath { get; } = @"BodyIndex.txt";
         public string depthDataPath { get; } = @"DepthData.txt";

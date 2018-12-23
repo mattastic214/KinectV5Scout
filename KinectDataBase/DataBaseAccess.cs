@@ -7,14 +7,14 @@ using Newtonsoft.Json;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using KinectDataBase.Interfaces.Access;
 
 namespace KinectDataBase
 {
-    public class DataBaseAccess : IDataBaseAccess
+    public class DataBaseAccess : IDataBaseAccess, IVitruviusSingleAccess
     {        
         private readonly object fileLock = new object();
-        private readonly object bodyLock = new object();
-        StringBuilder sb = new StringBuilder();             // Make StringBuilder an IDisposable
+        StringBuilder sb = new StringBuilder();
 
         private int i;
         private Random random = new Random();
@@ -88,19 +88,10 @@ namespace KinectDataBase
             return t;
         }
 
-        // Need to work through major performance issues when 2 people present.
-
-        // Use Node.js Asynchronous concept:
-        // 1. Send the task to the computer's file system.
-        // 2. Ready to handle the next request
-        // 3. When the file system has opened and read the file, the server returns the content to the client.
-        // Node.js eliminates the waiting, and simply continues with the next request.
-        // Node.js runs single-threaded, non-blocking, asynchronously programming, which is very memory efficient.
-        public Task WriteVitruviusToDataBase(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapperList, CancellationToken token, string path)
+        public Task WriteVitruviusSingle(KeyValuePair<TimeSpan, BodyWrapper> bodyWrapper, CancellationToken token, string path)
         {
-            // IList<BodyWrapper> bodyList = bodyWrapperList.Value;
-            BodyWrapper body = bodyWrapperList.Value.Closest();
-            TimeSpan time = bodyWrapperList.Key;
+            TimeSpan time = bodyWrapper.Key;
+            BodyWrapper body = bodyWrapper.Value;
 
             Task t = Task.Run(() =>
             {
@@ -116,29 +107,15 @@ namespace KinectDataBase
 
                         writer.WritePropertyName("TrackedPlayer");
 
+
                         if (body != null)
                         {
                             writer.WriteRaw(body.ToJSON());
                         }
-                        
+
                         writer.WriteEndObject();
                         str.WriteLine(sb.ToString());
                         sb.Clear();
-
-                        // Async could work if the sb.Clear(); were made to be Async as well with a group of the write functions.
-                        //writer.WriteRawAsync(body.ToJSON());
-                        //writer.WriteEndObjectAsync();
-                        //str.WriteLineAsync(sb.ToString());
-                        //sb.Clear();
-
-                        /* Code to write to same location on disk. Lock Thread. */
-                        //foreach (BodyWrapper body in bodyList)
-                        //{
-                        //    writer.WriteRaw(body.ToJSON());
-                        //    writer.WriteEndObject();
-                        //    str.WriteLine(sb.ToString());
-                        //    sb.Clear();
-                        //}
                     }
                 }
             }, token);

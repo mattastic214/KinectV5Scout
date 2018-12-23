@@ -8,9 +8,9 @@ using KinectDataBase.Interfaces.Controllers;
 
 namespace KinectDataBase
 {
-    public class DataBaseController : IJsonController, IDepthDataController, IBodyIndexController, IInfraredDataController, ILongExposureController
+    public class DataBaseController : IDepthDataController, IBodyIndexController, IInfraredDataController, ILongExposureController, IJsonSingleController
     {
-        private DataBaseAccess DataBaseAccess = null;
+        private DataBaseAccess DataBaseAccess { get; } = null;
         private DataBaseConstants DataBaseConstants { get; } = null;
 
         public DataBaseController()
@@ -26,11 +26,6 @@ namespace KinectDataBase
                     File.Create(DataBaseConstants.BasePath + file);
                 }
             }
-        }
-
-        public Task GetVitruviusData(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapper, CancellationToken token)
-        {
-            return DataBaseAccess.WriteVitruviusToDataBase(bodyWrapper, token, DataBaseConstants.BasePath + DataBaseConstants.vitruviusPath);
         }
 
         public Task GetDepthData(KeyValuePair<TimeSpan, DepthBitmapGenerator> depthData, CancellationToken token)
@@ -51,6 +46,11 @@ namespace KinectDataBase
         public Task GetLongExposureData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData, CancellationToken token)
         {
             return DataBaseAccess.WriteLongExposureDataToDataBase(longExposureData, token, DataBaseConstants.BasePath + DataBaseConstants.longExposureDataPath);
+        }
+
+        public Task GetVitruviusSingleData(KeyValuePair<TimeSpan, BodyWrapper> bodyWrapper, CancellationToken token)
+        {
+            return DataBaseAccess.WriteVitruviusSingle(bodyWrapper, token, DataBaseConstants.BasePath + DataBaseConstants.vitruviusPath);
         }
     }
 }
