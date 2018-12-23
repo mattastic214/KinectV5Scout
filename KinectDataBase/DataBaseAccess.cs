@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Newtonsoft.Json;
 using System.Text;
 using System.Threading;
@@ -16,20 +15,15 @@ namespace KinectDataBase
         private readonly object fileLock = new object();
         StringBuilder sb = new StringBuilder();
 
-        private int i;
-        private Random random = new Random();
-
         public Task WriteBodyIndexDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData, CancellationToken token, string path)
         {
-            i = random.Next(0, (int)Math.Pow(2, 16) - 1);
-
             Task t = Task.Run(() =>
             {
                 lock (fileLock)
                 {
                     using (StreamWriter str = File.AppendText(path))
                     {
-                        str.WriteLine("Depth data (ushort): " + bodyIndexData.Key + ", Value: " + bodyIndexData.Value.DepthData.GetValue(i) + "\n");
+                        str.WriteLine("Depth data (ushort): " + bodyIndexData.Key + ", Value: " + bodyIndexData.Value.DepthData.GetValue(4) + "\n");
                     }
                 }
             }, token);
@@ -39,15 +33,13 @@ namespace KinectDataBase
 
         public Task WriteDepthDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> depthData, CancellationToken token, string path)
         {
-            i = random.Next(0, (int)Math.Pow(2, 16) - 1);
-
             Task t = Task.Run(() =>
             {
                 lock (fileLock)
                 {
                     using (StreamWriter str = File.AppendText(path))
                     {
-                        str.WriteLine("Depth data (ushort): " + depthData.Key + ", Value: " + depthData.Value.DepthData.GetValue(i) + "\n");
+                        str.WriteLine("Depth data (ushort): " + depthData.Key + ", Value: " + depthData.Value.DepthData.GetValue(8) + "\n");
                     }
                 }
             }, token);
@@ -63,7 +55,7 @@ namespace KinectDataBase
                 {
                     using (StreamWriter str = File.AppendText(path))
                     {
-                        str.WriteLine("BodyFrameIndex Depth data (ushort): " + infraredData.Key + ", Value: " + infraredData.Value.InfraredData.FirstOrDefault() + "\n");
+                        str.WriteLine("BodyFrameIndex Depth data (ushort): " + infraredData.Key + ", Value: " + infraredData.Value.InfraredData.GetValue(4) + "\n");
                     }
                 }
             }, token);
@@ -79,8 +71,7 @@ namespace KinectDataBase
                 {
                     using (StreamWriter str = File.AppendText(path))
                     {
-                        str.WriteLine("BodyFrameIndex Depth data (ushort): " + longExposureData.Key + ", Value: " + longExposureData.Value + "\n");
-                        return longExposureData.Value != null;
+                        str.WriteLine("BodyFrameIndex Depth data (ushort): " + longExposureData.Key + ", Value: " + longExposureData.Value.InfraredData.GetValue(8) + "\n");
                     }
                 }
             }, token);
