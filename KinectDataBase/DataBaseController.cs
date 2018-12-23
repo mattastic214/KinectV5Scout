@@ -11,7 +11,6 @@ namespace KinectDataBase
     public class DataBaseController : IJsonController, IDepthDataController, IBodyIndexController, IInfraredDataController, ILongExposureController
     {
         private DataBaseAccess DataBaseAccess = null;
-        private DataBaseService Service = null;
         private DataBaseConstants DataBaseConstants { get; } = null;
 
         public DataBaseController()
@@ -29,34 +28,29 @@ namespace KinectDataBase
             }
         }
 
-        public Task GetVitruviusData(TimeSpan time, IList<BodyWrapper> bodyWrapper, CancellationToken token)
+        public Task GetVitruviusData(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapper, CancellationToken token)
         {
-            var cacheData = Service.ApplyKeyVitruvius(time, bodyWrapper, token);
-            return DataBaseAccess.WriteVitruviusToDataBase(cacheData, token, DataBaseConstants.BasePath + DataBaseConstants.vitruviusPath);
+            return DataBaseAccess.WriteVitruviusToDataBase(bodyWrapper, token, DataBaseConstants.BasePath + DataBaseConstants.vitruviusPath);
         }
 
-        public Task GetDepthData(TimeSpan time, DepthBitmapGenerator depthData, CancellationToken token)
+        public Task GetDepthData(KeyValuePair<TimeSpan, DepthBitmapGenerator> depthData, CancellationToken token)
         {
-            var cacheData = Service.ApplyKeyDepth(time, depthData, token);
-            return DataBaseAccess.WriteDepthDataToDataBase(cacheData, token, DataBaseConstants.BasePath + DataBaseConstants.depthDataPath);
+            return DataBaseAccess.WriteDepthDataToDataBase(depthData, token, DataBaseConstants.BasePath + DataBaseConstants.depthDataPath);
         }
 
-        public Task GetBodyIndexData(TimeSpan time, DepthBitmapGenerator bodyIndexData, CancellationToken token)
+        public Task GetBodyIndexData(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData, CancellationToken token)
         {
-            var cacheData = Service.ApplyKeyBodyIndex(time, bodyIndexData, token);
-            return DataBaseAccess.WriteBodyIndexDataToDataBase(cacheData, token, DataBaseConstants.BasePath + DataBaseConstants.bodyIndexPath);
+            return DataBaseAccess.WriteBodyIndexDataToDataBase(bodyIndexData, token, DataBaseConstants.BasePath + DataBaseConstants.bodyIndexPath);
         }
 
-        public Task GetInfraredData(TimeSpan time, InfraredBitmapGenerator infraredData, CancellationToken token)
+        public Task GetInfraredData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData, CancellationToken token)
         {
-            var cacheData = Service.ApplyKeyInfrared(time, infraredData, token);
-            return DataBaseAccess.WriteInfraredDataToDataBase(cacheData, token, DataBaseConstants.BasePath + DataBaseConstants.infraredDataPath);
+            return DataBaseAccess.WriteInfraredDataToDataBase(infraredData, token, DataBaseConstants.BasePath + DataBaseConstants.infraredDataPath);
         }
 
-        public Task GetLongExposureData(TimeSpan time, InfraredBitmapGenerator longExposureData, CancellationToken token)
+        public Task GetLongExposureData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData, CancellationToken token)
         {
-            var cacheData = Service.ApplyKeyInfrared(time, longExposureData, token);
-            return DataBaseAccess.WriteLongExposureDataToDataBase(cacheData, token, DataBaseConstants.BasePath + DataBaseConstants.longExposureDataPath);
+            return DataBaseAccess.WriteLongExposureDataToDataBase(longExposureData, token, DataBaseConstants.BasePath + DataBaseConstants.longExposureDataPath);
         }
     }
 }

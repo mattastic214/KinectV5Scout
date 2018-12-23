@@ -77,13 +77,11 @@
   <ItemGroup>
     <Compile Include="DataBaseAccess.cs" />
     <Compile Include="DataBaseConstants.cs" />
-    <Compile Include="DataBaseService.cs" />
     <Compile Include="Interfaces\Controllers\IBodyIndexController.cs" />
     <Compile Include="Interfaces\Controllers\IDepthDataController.cs" />
     <Compile Include="Interfaces\Controllers\IInfraredDataController.cs" />
     <Compile Include="Interfaces\Controllers\IJsonController.cs" />
     <Compile Include="Interfaces\Controllers\ILongExposureController.cs" />
-    <Compile Include="Interfaces\Service\IApplyKey.cs" />
     <Compile Include="Interfaces\Access\IDataBaseAccess.cs" />
     <Compile Include="DataBaseController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -29,9 +29,7 @@ namespace KinectDataBase
                 {
                     using (StreamWriter str = File.AppendText(path))
                     {
-                        // var path = "BodyIndex.txt";
                         str.WriteLine("Depth data (ushort): " + bodyIndexData.Key + ", Value: " + bodyIndexData.Value.DepthData.GetValue(i) + "\n");
-                        //bodyIndexData.Value.Bitmap.Save(basePath);
                     }
                 }
             }, token);
@@ -50,7 +48,6 @@ namespace KinectDataBase
                     using (StreamWriter str = File.AppendText(path))
                     {
                         str.WriteLine("Depth data (ushort): " + depthData.Key + ", Value: " + depthData.Value.DepthData.GetValue(i) + "\n");
-                        // return depthData.Value != null;
                     }
                 }
             }, token);
@@ -67,7 +64,6 @@ namespace KinectDataBase
                     using (StreamWriter str = File.AppendText(path))
                     {
                         str.WriteLine("BodyFrameIndex Depth data (ushort): " + infraredData.Key + ", Value: " + infraredData.Value.InfraredData.FirstOrDefault() + "\n");
-                        // return infraredData.Value != null;
                     }
                 }
             }, token);
@@ -126,7 +122,7 @@ namespace KinectDataBase
                         }
                         
                         writer.WriteEndObject();
-                        str.Write(sb.ToString());
+                        str.WriteLine(sb.ToString());
                         sb.Clear();
 
                         // Async could work if the sb.Clear(); were made to be Async as well with a group of the write functions.
@@ -149,6 +145,5 @@ namespace KinectDataBase
 
             return t;
         }
-
     }
 }

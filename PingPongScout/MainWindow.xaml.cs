@@ -181,18 +181,15 @@ namespace PingPongScout
                         timeStamp = depthFrame.RelativeTime;
                         _depthBitmapGenerator.Update(depthFrame);
 
-                        _depthData = _depthBitmapGenerator.DepthData;
-
-                        depthTask = DataBaseController.GetDepthData(timeStamp, _depthBitmapGenerator, token);
+                        depthTask = DataBaseController.GetDepthData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator), token);
 
                         using (var bodyIndexFrame = reference.BodyIndexFrameReference.AcquireFrame())
                         {
                             if (bodyIndexFrame != null)
                             {
-                                // _depthBitmapGenerator is very taxing on the CPU, delegate to another task.
                                 _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
 
-                                bodyIndexTask = DataBaseController.GetBodyIndexData(timeStamp, _depthBitmapGenerator, token);
+                                bodyIndexTask = DataBaseController.GetBodyIndexData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator), token);
 
                                 if (cameraView == CameraType.BodyIndex)
                                 {
@@ -213,17 +210,13 @@ namespace PingPongScout
 
                         _infraredBitmapGenerator.Update(infraredFrame);
 
-                        infraredTask = DataBaseController.GetInfraredData(timeStamp, _infraredBitmapGenerator, token);
-                        //infraredTask = DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator), token);
+                        infraredTask = DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator), token);
 
                         using (var longExposureFrame = reference.LongExposureInfraredFrameReference.AcquireFrame())
                         {
                             if (longExposureFrame != null)
                             {
-                                _infraredBitmapGenerator.Update(infraredFrame);
-
-                                longExpTask = DataBaseController.GetLongExposureData(timeStamp, _infraredBitmapGenerator, token);
-                                //longExpTask = DataBaseController.GetLongExposureData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator), token);
+                                longExpTask = DataBaseController.GetLongExposureData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator), token);
                             }
                         }
 
@@ -247,8 +240,7 @@ namespace PingPongScout
                                                     .Select(b => BodyWrapper.Create(b, _coordinateMapper, Visualization.Infrared))
                                                     .ToList();
 
-                        // var trackedBodies = new KeyValuePair<TimeSpan, IList<BodyWrapper>>(timeStamp, bodyDataList);
-                        vitruviusTask = DataBaseController.GetVitruviusData(timeStamp, bodyDataList, token);
+                        vitruviusTask = DataBaseController.GetVitruviusData(new KeyValuePair<TimeSpan, IList<BodyWrapper>>(timeStamp, bodyDataList), token);
 
                         if (cameraView == CameraType.Skeletal)
                         {
@@ -285,12 +277,12 @@ namespace PingPongScout
 
                 try
                 {
-                    if (depthTask != null) { await depthTask; }
-                    if (infraredTask != null) { await infraredTask; }
-                    if (bodyBitMapUpdateTask != null) { await bodyBitMapUpdateTask; }
-                    if (bodyIndexTask != null) { await bodyIndexTask; }
-                    if (longExpTask != null) { await longExpTask; }
-                    if (vitruviusTask != null) { await vitruviusTask; }
+                    if (depthTask != null) { await depthTask; depthTask = null; }
+                    if (infraredTask != null) { await infraredTask; infraredTask = null; }
+                    if (bodyBitMapUpdateTask != null) { await bodyBitMapUpdateTask; bodyBitMapUpdateTask = null; }
+                    if (bodyIndexTask != null) { await bodyIndexTask; bodyIndexTask = null; }
+                    if (longExpTask != null) { await longExpTask; longExpTask = null; }
+                    if (vitruviusTask != null) { await vitruviusTask; vitruviusTask = null; }
                 }
                 catch (OperationCanceledException oce)
                 {
