@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7502FDF2-22A8-4DD9-9F87-85B8FC59A4B3}</ProjectGuid>
+    <ProjectGuid>{9D6B3B1E-603B-40B6-B410-18C3712CEA22}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Recorder</RootNamespace>
-    <AssemblyName>Recorder</AssemblyName>
+    <RootNamespace>FileConstants</RootNamespace>
+    <AssemblyName>FileConstants</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -31,12 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LightBuzz">
-      <HintPath>..\..\..\assemblies\Vitruvius_(Premium)5.0.5\Assets\Plugins\LightBuzz.dll</HintPath>
-    </Reference>
-    <Reference Include="LightBuzz.Vitruvius">
-      <HintPath>..\..\..\assemblies\Vitruvius_(Premium)5.0.5\Assets\Plugins\LightBuzz.Vitruvius.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -47,7 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PlayerRecorder.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="ConstantsList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

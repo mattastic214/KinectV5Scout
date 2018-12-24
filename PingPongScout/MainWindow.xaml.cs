@@ -9,6 +9,7 @@ using System.Threading;
 using System.Linq;
 using KinectDataBase;
 using KinectConstantsBGRA;
+using Recorder;
 using System.Windows.Shapes;
 using System.Windows.Media;
 using System.Windows.Controls;
@@ -46,6 +47,7 @@ namespace PingPongScout
         private CancellationTokenSource tokenSource = null;
 
         private DataBaseController DataBaseController = null;
+        private PlayerRecorder PlayerRecorder = null;
         private TimeSpan timeStamp;
         private KinectSensor _kinectSensor = null;
         //private KinectViewer _kinectViewer = null;                  // What use is this??
@@ -67,7 +69,23 @@ namespace PingPongScout
         delegate void constructorOperationDelegate();
         private constructorOperationDelegate constructorOperation;
 
+        delegate void endOperationDelegate();
+        private endOperationDelegate endOperation;
+
         delegate void initializeFrameDataDelegate(int depthWidth, int depthHeight);
+
+        private void endFrameAndKinect()
+        {
+            if (_multiSourceFrameReader != null)
+            {
+                _multiSourceFrameReader.Dispose();
+            }
+
+            if (_kinectSensor != null)
+            {
+                _kinectSensor.Close();
+            }
+        }
 
         #endregion
 
@@ -112,6 +130,13 @@ namespace PingPongScout
             constructorOperation += (() => { InitializeBitmap(depthWidth, depthHeight); });
             constructorOperation += (() => { InitializeFrameData(depthWidth, depthHeight); });
             constructorOperation += InitializeDataAccessController;
+            // constructorOperation += PlayerRecorder.ToggleRecord;
+        }
+
+        private void AssignEndOperations()
+        {
+            endOperation += endFrameAndKinect;
+            //endOperation += PlayerRecorder.ToggleRecord;
         }
 
         #endregion
@@ -137,15 +162,7 @@ namespace PingPongScout
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            if (_multiSourceFrameReader != null)
-            {
-                _multiSourceFrameReader.Dispose();
-            }
-
-            if (_kinectSensor != null)
-            {
-                _kinectSensor.Close();                 
-            }
+            endOperation();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -158,6 +175,7 @@ namespace PingPongScout
                 int depthHeight = _kinectSensor.DepthFrameSource.FrameDescription.Height;
 
                 AssignConstructors(depthHeight, depthHeight);
+                AssignEndOperations();
 
                 constructorOperation();
             }

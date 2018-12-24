@@ -77,6 +77,8 @@
   <ItemGroup>
     <Compile Include="DataBaseAccess.cs" />
     <Compile Include="DataBaseConstants.cs" />
+    <Compile Include="Interfaces\Access\IEndArray.cs" />
+    <Compile Include="Interfaces\Access\IInitArray.cs" />
     <Compile Include="Interfaces\Access\IVitruviusListAccess.cs" />
     <Compile Include="Interfaces\Access\IVitruviusSingleAccess.cs" />
     <Compile Include="Interfaces\Controllers\IBodyIndexController.cs" />

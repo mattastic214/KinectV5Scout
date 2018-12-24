@@ -10,10 +10,42 @@ using KinectDataBase.Interfaces.Access;
 
 namespace KinectDataBase
 {
-    public class DataBaseAccess : IDataBaseAccess, IVitruviusSingleAccess
+    public class DataBaseAccess : IDataBaseAccess, IVitruviusSingleAccess, IInitArray, IEndArray
     {        
         private readonly object fileLock = new object();
         StringBuilder sb = new StringBuilder();
+
+        public Task WriteArrayBeginning(CancellationToken token, string path)
+        {
+            Task t = Task.Run(() =>
+            {
+                lock (fileLock)
+                {
+                    using (StreamWriter str = File.AppendText(path))
+                    {
+                        str.Write("[");
+                    }
+                }
+            }, token);
+
+            return t;
+        }
+
+        public Task WriteArrayEnd(CancellationToken token, string path)
+        {
+            Task t = Task.Run(() =>
+            {
+                lock (fileLock)
+                {
+                    using (StreamWriter str = File.AppendText(path))
+                    {
+                        str.Write("]");
+                    }
+                }
+            }, token);
+
+            return t;
+        }
 
         public Task WriteBodyIndexDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData, CancellationToken token, string path)
         {
@@ -93,17 +125,16 @@ namespace KinectDataBase
                     using (JsonTextWriter writer = new JsonTextWriter(strwtr))
                     {
                         writer.WriteStartObject();
+                        
                         writer.WritePropertyName("RelativeTime");
                         writer.WriteValue(time);
-
                         writer.WritePropertyName("TrackedPlayer");
-
+                        
 
                         if (body != null)
                         {
-                            writer.WriteRaw(body.ToJSON());
+                            writer.WriteRawValue(body.ToJSON());
                         }
-
                         writer.WriteEndObject();
                         str.WriteLine(sb.ToString());
                         sb.Clear();

@@ -55,12 +55,6 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Emgu.CV.UI">
-      <HintPath>..\..\..\assemblies\emgucv-windesktop 3.4.1.2976\bin\Emgu.CV.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="Emgu.CV.World">
-      <HintPath>..\..\..\assemblies\emgucv-windesktop 3.4.1.2976\bin\Emgu.CV.World.dll</HintPath>
-    </Reference>
     <Reference Include="LightBuzz.Vitruvius">
       <HintPath>..\..\..\assemblies\Vitruvius_(Premium)5.0.5\LightBuzz.Vitruvius.5.0.5\LightBuzz.Vitruvius.4.5.0-Legacy\Assemblies\WPF\LightBuzz.Vitruvius.dll</HintPath>
     </Reference>
@@ -141,6 +135,10 @@
     <ProjectReference Include="..\KinectDataBase\KinectDataBase.csproj">
       <Project>{487a8c49-c902-4ec1-bc66-c00ef83c1d3a}</Project>
       <Name>KinectDataBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Recorder\Recorder.csproj">
+      <Project>{7502fdf2-22a8-4dd9-9f87-85b8fc59a4b3}</Project>
+      <Name>Recorder</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
