@@ -13,15 +13,15 @@ using Recorder;
 using System.Windows.Shapes;
 using System.Windows.Media;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 namespace PingPongScout
 {
     enum CameraType
     {
-        Skeletal,
-        BodyIndex,
-        Infrared,
-        None
+        BodyIndex = 1,
+        Infrared = 2,
+        None = 3
     };
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -43,17 +43,14 @@ namespace PingPongScout
         Task longExpTask = null;
         Task vitruviusTask = null;
         Task bodyBitMapUpdateTask = null;
-        // Task[] taskArray = new Task[6];
         private CancellationTokenSource tokenSource = null;
 
         private DataBaseController DataBaseController = null;
         private PlayerRecorder PlayerRecorder = null;
         private TimeSpan timeStamp;
         private KinectSensor _kinectSensor = null;
-        //private KinectViewer _kinectViewer = null;                  // What use is this??
         private MultiSourceFrameReader _multiSourceFrameReader = null;
         private CoordinateMapper _coordinateMapper = null;
-
 
         private InfraredBitmapGenerator _infraredBitmapGenerator = null;
         private DepthBitmapGenerator _depthBitmapGenerator = null;
@@ -114,7 +111,6 @@ namespace PingPongScout
         private void InitializeFrameData(int depthWidth, int depthHeight)
         {
             _bodyData = new Body[_kinectSensor.BodyFrameSource.BodyCount];
-
             _depthData = new ushort[depthWidth * depthHeight];
         }
 
@@ -147,13 +143,6 @@ namespace PingPongScout
         {
             InitializeComponent();
             WindowState = cameraView == CameraType.None ? WindowState.Minimized : WindowState.Maximized;
-            if (cameraView == CameraType.Skeletal)
-            {
-                Height = 1920;
-                Width = 1080;
-                grid.Height = 1920;
-                grid.Width = 1080; 
-            }
         }
 
         #endregion
@@ -186,7 +175,7 @@ namespace PingPongScout
             MultiSourceFrame reference = e.FrameReference.AcquireFrame();
 
             // COORDINATE MAPPING
-            if (reference != null )
+            if (reference != null)
             {
                 tokenSource = new CancellationTokenSource();
                 CancellationToken token = tokenSource.Token;
@@ -246,6 +235,7 @@ namespace PingPongScout
                 {
                     if (bodyFrame != null)
                     {
+                        canvas.Children.Clear();
                         bodyFrame.GetAndRefreshBodyData(_bodyData);
                         timeStamp = bodyFrame.RelativeTime;
 
@@ -254,13 +244,10 @@ namespace PingPongScout
                         //                            .ToList();
                         //vitruviusTask = DataBaseController.GetVitruviusData(new KeyValuePair<TimeSpan, IList<BodyWrapper>>(timeStamp, bodyDataList), token);
 
-                        var bodyData = BodyWrapper.Create(_bodyData.Closest(), _coordinateMapper, Visualization.Infrared);
+                        var bodyData = BodyWrapper.Create(_bodyData
+                                                        .Where(b => b.IsTracked)
+                                                        .Closest(), _coordinateMapper, Visualization.Infrared);
                         vitruviusTask = DataBaseController.GetVitruviusSingleData(new KeyValuePair<TimeSpan, BodyWrapper>(timeStamp, bodyData), token);
-
-                        if (cameraView == CameraType.Skeletal)
-                        {
-                            Console.WriteLine("All your bases are belong to us.");
-                        }
                     }
                 }
 

@@ -15,7 +15,7 @@
         <Viewbox>
             <Grid Name="grid" Width="512" Height="424">
                 <Image Name="camera" Stretch="Uniform" />
-                <Canvas Name="canvas">
+                <Canvas Name="canvas" Width="512" Height="424">
                 </Canvas>
             </Grid>
         </Viewbox>

@@ -77,8 +77,6 @@
   <ItemGroup>
     <Compile Include="DataBaseAccess.cs" />
     <Compile Include="DataBaseConstants.cs" />
-    <Compile Include="Interfaces\Access\IEndArray.cs" />
-    <Compile Include="Interfaces\Access\IInitArray.cs" />
     <Compile Include="Interfaces\Access\IVitruviusListAccess.cs" />
     <Compile Include="Interfaces\Access\IVitruviusSingleAccess.cs" />
     <Compile Include="Interfaces\Controllers\IBodyIndexController.cs" />
@@ -101,14 +99,12 @@
     <Resource Include="KinectDataOutput\InfraredData.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="KinectDataOutput\Vitruvius.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="KinectDataOutput\DepthBitmap.bmp" />
     <Content Include="KinectDataOutput\LongExposureData.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="KinectDataOutput\Vitruvius.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

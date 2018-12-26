@@ -11,7 +11,7 @@ namespace KinectDataBase
         public string depthDataPath { get; } = @"DepthData.txt";
         public string infraredDataPath { get; } = @"InfraredData.txt";
         public string longExposureDataPath { get; } = @"LongExposureData.txt";
-        public string vitruviusPath { get; } = @"Vitruvius.txt";
+        public string vitruviusPath { get; } = @"Vitruvius.json";
 
         public readonly List<string> dbConstants = new List<string>();
 

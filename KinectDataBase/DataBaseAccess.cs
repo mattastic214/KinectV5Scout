@@ -10,42 +10,10 @@ using KinectDataBase.Interfaces.Access;
 
 namespace KinectDataBase
 {
-    public class DataBaseAccess : IDataBaseAccess, IVitruviusSingleAccess, IInitArray, IEndArray
+    public class DataBaseAccess : IDataBaseAccess, IVitruviusSingleAccess
     {        
         private readonly object fileLock = new object();
         StringBuilder sb = new StringBuilder();
-
-        public Task WriteArrayBeginning(CancellationToken token, string path)
-        {
-            Task t = Task.Run(() =>
-            {
-                lock (fileLock)
-                {
-                    using (StreamWriter str = File.AppendText(path))
-                    {
-                        str.Write("[");
-                    }
-                }
-            }, token);
-
-            return t;
-        }
-
-        public Task WriteArrayEnd(CancellationToken token, string path)
-        {
-            Task t = Task.Run(() =>
-            {
-                lock (fileLock)
-                {
-                    using (StreamWriter str = File.AppendText(path))
-                    {
-                        str.Write("]");
-                    }
-                }
-            }, token);
-
-            return t;
-        }
 
         public Task WriteBodyIndexDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData, CancellationToken token, string path)
         {
