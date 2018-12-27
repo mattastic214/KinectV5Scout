@@ -30,8 +30,10 @@ namespace PingPongScout
 
         #region CameraSettings
 
-        readonly CameraType cameraView = CameraType.Infrared;
-        //private VideoRecorder videoRecorder = new VideoRecorder();
+        readonly string FOLDER_PATH = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory + "../../", "video");
+        readonly CameraType cameraView = CameraType.BodyIndex;
+        VitruviusRecorder _recorder = new VitruviusRecorder();
+        Visualization Visualization;
 
         #endregion
 
@@ -70,7 +72,7 @@ namespace PingPongScout
 
         delegate void initializeFrameDataDelegate(int depthWidth, int depthHeight);
 
-        private void endFrameAndKinect()
+        private void CloseFrameAndKinect()
         {
             if (_multiSourceFrameReader != null)
             {
@@ -118,6 +120,22 @@ namespace PingPongScout
             DataBaseController = new DataBaseController();
         }
 
+        private void ToggleRecorder()
+        {
+            if (_recorder.IsRecording)
+            {
+                _recorder.Stop();
+            }
+            else
+            {
+                _recorder.Clear();
+
+                _recorder.Visualization = this.Visualization;
+                _recorder.Folder = FOLDER_PATH;
+                _recorder.Start();
+            }
+        }
+
         private void AssignConstructors(int depthWidth, int depthHeight)
         {
             constructorOperation += OpenKinect;
@@ -125,13 +143,13 @@ namespace PingPongScout
             constructorOperation += (() => { InitializeBitmap(depthWidth, depthHeight); });
             constructorOperation += (() => { InitializeFrameData(depthWidth, depthHeight); });
             constructorOperation += InitializeDataAccessController;
-            // constructorOperation += PlayerRecorder.ToggleRecord;
+            constructorOperation += ToggleRecorder;
         }
 
         private void AssignEndOperations()
         {
-            endOperation += endFrameAndKinect;
-            //endOperation += PlayerRecorder.ToggleRecord;
+            endOperation += CloseFrameAndKinect;
+            endOperation += ToggleRecorder;
         }
 
         #endregion
@@ -142,6 +160,7 @@ namespace PingPongScout
         {
             InitializeComponent();
             WindowState = cameraView == CameraType.None ? WindowState.Minimized : WindowState.Maximized;
+            Visualization = cameraView == CameraType.Infrared ? Visualization.Infrared : Visualization.Depth;
         }
 
         #endregion
@@ -172,6 +191,7 @@ namespace PingPongScout
         private async void MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
         {
             MultiSourceFrame reference = e.FrameReference.AcquireFrame();
+            VitruviusFrame recordingFrame = new VitruviusFrame();
 
             // COORDINATE MAPPING
             if (reference != null)
@@ -195,9 +215,11 @@ namespace PingPongScout
                         if (cameraView == CameraType.BodyIndex)
                         {
                             camera.Source = DepthExtensions.ToBitmap(depthFrame, bodyIndexFrame);
+                            recordingFrame.Image = _depthBitmapGenerator.Pixels;
                         }
                     }
                 }
+
 
                 // New Task 2:
                 using (var infraredFrame = reference.InfraredFrameReference.AcquireFrame())
@@ -221,6 +243,7 @@ namespace PingPongScout
                         if (cameraView == CameraType.Infrared)
                         {
                             camera.Source = InfraredExtensions.ToBitmap(infraredFrame);
+                            recordingFrame.Image = _infraredBitmapGenerator.Pixels;
                         }
                     }
                 }
@@ -236,9 +259,10 @@ namespace PingPongScout
 
                         var bodyData = BodyWrapper.Create(_bodyData
                                                         .Where(b => b.IsTracked)
-                                                        .Closest(), _coordinateMapper, Visualization.Infrared);
+                                                        .Closest(), _coordinateMapper, this.Visualization);
 
                         vitruviusTask = DataBaseController.GetVitruviusSingleData(new KeyValuePair<TimeSpan, BodyWrapper>(timeStamp, bodyData), token);
+                        recordingFrame.Body = bodyData;
                     }
                 }
 
@@ -253,6 +277,11 @@ namespace PingPongScout
                 catch (OperationCanceledException oce)
                 {
                     Console.WriteLine(oce.Message);
+                }
+
+                if (_recorder.IsRecording)
+                {
+                    _recorder.AddFrame(recordingFrame);
                 }
             }
         }
