@@ -10,10 +10,6 @@ using System.Linq;
 using KinectDataBase;
 using KinectConstantsBGRA;
 using Recorder;
-using System.Windows.Shapes;
-using System.Windows.Media;
-using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 
 namespace PingPongScout
 {
@@ -32,17 +28,20 @@ namespace PingPongScout
     public partial class MainWindow : Window
     {
 
-        #region Members
+        #region CameraSettings
 
-        readonly CameraType cameraView = CameraType.BodyIndex;
+        readonly CameraType cameraView = CameraType.Infrared;
         //private VideoRecorder videoRecorder = new VideoRecorder();
+
+        #endregion
+
+        #region Members
 
         Task depthTask = null;
         Task infraredTask = null;
         Task bodyIndexTask = null;
         Task longExpTask = null;
         Task vitruviusTask = null;
-        Task bodyBitMapUpdateTask = null;
         private CancellationTokenSource tokenSource = null;
 
         private DataBaseController DataBaseController = null;
@@ -180,32 +179,27 @@ namespace PingPongScout
                 tokenSource = new CancellationTokenSource();
                 CancellationToken token = tokenSource.Token;
 
+                // New Task 1:
                 using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
+                using (var bodyIndexFrame = reference.BodyIndexFrameReference.AcquireFrame())
                 {
-                    if (depthFrame != null)
+                    if (depthFrame != null && bodyIndexFrame != null)
                     {
                         timeStamp = depthFrame.RelativeTime;
-                        _depthBitmapGenerator.Update(depthFrame);
+                        _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
 
                         depthTask = DataBaseController.GetDepthData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator), token);
 
-                        using (var bodyIndexFrame = reference.BodyIndexFrameReference.AcquireFrame())
+                        bodyIndexTask = DataBaseController.GetBodyIndexData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator), token);
+
+                        if (cameraView == CameraType.BodyIndex)
                         {
-                            if (bodyIndexFrame != null)
-                            {
-                                _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
-
-                                bodyIndexTask = DataBaseController.GetBodyIndexData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator), token);
-
-                                if (cameraView == CameraType.BodyIndex)
-                                {
-                                    camera.Source = DepthExtensions.ToBitmap(depthFrame, bodyIndexFrame);
-                                }
-                            }
+                            camera.Source = DepthExtensions.ToBitmap(depthFrame, bodyIndexFrame);
                         }
                     }
                 }
 
+                // New Task 2:
                 using (var infraredFrame = reference.InfraredFrameReference.AcquireFrame())
                 {
                     if (infraredFrame != null)
@@ -231,22 +225,19 @@ namespace PingPongScout
                     }
                 }
 
+                // New Task 3:
                 using (var bodyFrame = reference.BodyFrameReference.AcquireFrame())
                 {
                     if (bodyFrame != null)
                     {
-                        canvas.Children.Clear();
                         bodyFrame.GetAndRefreshBodyData(_bodyData);
                         timeStamp = bodyFrame.RelativeTime;
 
-                        //var bodyDataList = _bodyData.Where(b => b.IsTracked)
-                        //                            .Select(b => BodyWrapper.Create(b, _coordinateMapper, Visualization.Infrared))
-                        //                            .ToList();
-                        //vitruviusTask = DataBaseController.GetVitruviusData(new KeyValuePair<TimeSpan, IList<BodyWrapper>>(timeStamp, bodyDataList), token);
 
                         var bodyData = BodyWrapper.Create(_bodyData
                                                         .Where(b => b.IsTracked)
                                                         .Closest(), _coordinateMapper, Visualization.Infrared);
+
                         vitruviusTask = DataBaseController.GetVitruviusSingleData(new KeyValuePair<TimeSpan, BodyWrapper>(timeStamp, bodyData), token);
                     }
                 }
@@ -255,7 +246,6 @@ namespace PingPongScout
                 {
                     if (depthTask != null) { await depthTask; depthTask = null; }
                     if (infraredTask != null) { await infraredTask; infraredTask = null; }
-                    if (bodyBitMapUpdateTask != null) { await bodyBitMapUpdateTask; bodyBitMapUpdateTask = null; }
                     if (bodyIndexTask != null) { await bodyIndexTask; bodyIndexTask = null; }
                     if (longExpTask != null) { await longExpTask; longExpTask = null; }
                     if (vitruviusTask != null) { await vitruviusTask; vitruviusTask = null; }

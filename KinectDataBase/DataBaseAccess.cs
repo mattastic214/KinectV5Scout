@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using KinectDataBase.Interfaces.Access;
+using Microsoft.Kinect;
 
 namespace KinectDataBase
 {
@@ -92,19 +93,16 @@ namespace KinectDataBase
                     using (StringWriter strwtr = new StringWriter(sb))
                     using (JsonTextWriter writer = new JsonTextWriter(strwtr))
                     {
+                        writer.WriteRaw(",");
+
                         writer.WriteStartObject();
-                        
                         writer.WritePropertyName("RelativeTime");
                         writer.WriteValue(time);
                         writer.WritePropertyName("TrackedPlayer");
-                        
 
-                        if (body != null)
-                        {
-                            writer.WriteRawValue(body.ToJSON());
-                        }
+                        writer.WriteRawValue(body.ToJSON());
                         writer.WriteEndObject();
-                        str.WriteLine(sb.ToString());
+                        str.Write(sb.ToString());
                         sb.Clear();
                     }
                 }

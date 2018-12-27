@@ -5,6 +5,7 @@ using System.Threading;
 using System.IO;
 using System.Threading.Tasks;
 using KinectDataBase.Interfaces.Controllers;
+using Microsoft.Kinect;
 
 namespace KinectDataBase
 {

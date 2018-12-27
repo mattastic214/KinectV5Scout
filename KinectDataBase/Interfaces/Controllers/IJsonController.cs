@@ -1,4 +1,4 @@
-﻿using LightBuzz.Vitruvius;
+﻿using Microsoft.Kinect;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -8,6 +8,6 @@ namespace KinectDataBase.Interfaces.Controllers
 {
     public interface IJsonController
     {
-        Task GetVitruviusData(KeyValuePair<TimeSpan, IList<BodyWrapper>> bodyWrapper, CancellationToken token);
+        Task GetVitruviusData(KeyValuePair<TimeSpan, IEnumerable<Body>> bodyWrapper, CancellationToken token);
     }
 }
