@@ -194,7 +194,7 @@ namespace PingPongScout
             VitruviusFrame recordingFrame = new VitruviusFrame();
 
             // COORDINATE MAPPING
-            if (reference != null)
+            if (reference != null && _recorder.IsRecording)
             {
                 tokenSource = new CancellationTokenSource();
                 CancellationToken token = tokenSource.Token;
@@ -279,10 +279,7 @@ namespace PingPongScout
                     Console.WriteLine(oce.Message);
                 }
 
-                if (_recorder.IsRecording)
-                {
-                    _recorder.AddFrame(recordingFrame);
-                }
+                _recorder.AddFrame(recordingFrame);
             }
         }
 
