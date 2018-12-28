@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 using KinectDataBase.Interfaces.Access;
 using Microsoft.Kinect;
 
@@ -15,6 +16,7 @@ namespace KinectDataBase
     {        
         private readonly object fileLock = new object();
         StringBuilder sb = new StringBuilder();
+        DataBaseConstants db = new DataBaseConstants();
 
         public Task WriteBodyIndexDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData, CancellationToken token, string path)
         {
@@ -22,10 +24,13 @@ namespace KinectDataBase
             {
                 lock (fileLock)
                 {
-                    using (StreamWriter str = File.AppendText(path))
-                    {
-                        str.WriteLine("Depth data (ushort): " + bodyIndexData.Key + ", Value: " + bodyIndexData.Value.DepthData.GetValue(4) + "\n");
-                    }
+                    bodyIndexData.Value.HighlightedBitmap.Save(path);
+                    
+                    //using (StreamWriter str = File.AppendText(path))
+                    //{
+                    //    //str.WriteLine("BodyIndex data TimeStamp: " + bodyIndexData.Key + ", Value: " + bodyIndexData.Value.Bitmap + "\n");
+                    //    //bodyIndexData.Value.HighlightedPixels;
+                    //}
                 }
             }, token);
 
@@ -38,10 +43,12 @@ namespace KinectDataBase
             {
                 lock (fileLock)
                 {
-                    using (StreamWriter str = File.AppendText(path))
-                    {
-                        str.WriteLine("Depth data (ushort): " + depthData.Key + ", Value: " + depthData.Value.DepthData.GetValue(8) + "\n");
-                    }
+                    depthData.Value.Bitmap.Save(path);
+                    //using (StreamWriter str = File.AppendText(path))
+                    //{
+                    //    //str.WriteLine("Depth data TimeStamp: " + depthData.Key + ", Value: " + depthData.Value.Bitmap + "\n");
+                        
+                    //}
                 }
             }, token);
 
@@ -54,10 +61,12 @@ namespace KinectDataBase
             {
                 lock (fileLock)
                 {
-                    using (StreamWriter str = File.AppendText(path))
-                    {
-                        str.WriteLine("BodyFrameIndex Depth data (ushort): " + infraredData.Key + ", Value: " + infraredData.Value.InfraredData.GetValue(4) + "\n");
-                    }
+                    infraredData.Value.Bitmap.Save(path);
+                    //using (StreamWriter str = File.AppendText(path))
+                    //{
+                    //    //str.WriteLine("Infrared data TimeStamp: " + infraredData.Key + ", Value: " + infraredData.Value.InfraredData[34] + "\n");
+                        
+                    //}
                 }
             }, token);
 
@@ -70,10 +79,12 @@ namespace KinectDataBase
             {
                 lock (fileLock)
                 {
-                    using (StreamWriter str = File.AppendText(path))
-                    {
-                        str.WriteLine("BodyFrameIndex Depth data (ushort): " + longExposureData.Key + ", Value: " + longExposureData.Value.InfraredData.GetValue(8) + "\n");
-                    }
+                    longExposureData.Value.Bitmap.Save(path);
+                    //using (StreamWriter str = File.AppendText(path))
+                    //{
+                    //    //str.WriteLine("LongExposure data TimeStamp: " + longExposureData.Key + ", Value: " + longExposureData.Value.InfraredData.GetValue(8) + "\n");
+                        
+                    //}
                 }
             }, token);
 

@@ -22,6 +22,8 @@ namespace KinectConstantsBGRA
         /// </summary>
         public static readonly int BYTES_PER_PIXEL = (FORMAT.BitsPerPixel + 7) / 8;
 
+        public static readonly int MAP_DEPTH_TO_BYTE = 8000 / 256;
+
         #endregion
 
     }

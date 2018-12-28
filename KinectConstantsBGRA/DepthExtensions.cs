@@ -164,6 +164,119 @@ namespace KinectConstantsBGRA
             return _bitmap;
         }
 
+        public static BitmapSource ToLayeredBitmap(this DepthFrame frame)
+        {
+            ushort minDepth = frame.DepthMinReliableDistance;
+            ushort maxDepth = frame.DepthMaxReliableDistance;
+            
+
+            if (_bitmap == null)
+            {
+                _width = frame.FrameDescription.Width;
+                _height = frame.FrameDescription.Height;
+                _depthData = new ushort[_width * _height];
+                _pixels = new byte[_width * _height * Constants.BYTES_PER_PIXEL];
+                _bitmap = new WriteableBitmap(_width, _height, Constants.DPI, Constants.DPI, Constants.FORMAT, null);
+            }
+
+            frame.CopyFrameDataToArray(_depthData);
+
+            // Convert the depth to RGB.
+            int colorIndex = 0;
+            for (int depthIndex = 0; depthIndex < _depthData.Length; ++depthIndex)
+            {
+                // Get the depth for this pixel
+                ushort depth = _depthData[depthIndex];
+
+                // To convert to a byte, we're discarding the most-significant
+                // rather than least-significant bits.
+                // We're preserving detail, although the intensity will "wrap."
+                // Values outside the reliable depth range are mapped to 0 (black).
+                byte intensity = (byte)(depth >= minDepth && depth <= maxDepth ? depth : 0);
+
+                _pixels[colorIndex++] = (byte)(depth >= minDepth && depth <= maxDepth ? depth : 0);                                     // Blue
+                _pixels[colorIndex++] = (byte)(depth >= minDepth && depth <= maxDepth ? depth / Constants.MAP_DEPTH_TO_BYTE : 0);       // Green
+                _pixels[colorIndex++] = (byte)(depth >= minDepth && depth <= maxDepth ? depth / Constants.MAP_DEPTH_TO_BYTE : 0);       // Red
+
+                // We're outputting BGR, the last byte in the 32 bits is unused so skip it
+                // If we were outputting BGRA, we would write alpha here.
+                ++colorIndex;
+            }
+
+            _bitmap.Lock();
+
+            Marshal.Copy(_pixels, 0, _bitmap.BackBuffer, _pixels.Length);
+            _bitmap.AddDirtyRect(new Int32Rect(0, 0, _width, _height));
+
+            _bitmap.Unlock();
+
+            return _bitmap;
+        }
+
+        public static BitmapSource ToLayeredBitmap(this DepthFrame depthFrame, BodyIndexFrame bodyIndexFrame)
+        {
+            // Get the depth for this pixel
+            ushort minDepth = depthFrame.DepthMinReliableDistance;
+            ushort maxDepth = depthFrame.DepthMaxReliableDistance;
+
+
+            if (_bodyData == null)
+            {
+                _width = depthFrame.FrameDescription.Width;
+                _height = depthFrame.FrameDescription.Height;
+                _depthData = new ushort[_width * _height];
+                _bodyData = new byte[_width * _height];
+                _pixels = new byte[_width * _height * Constants.BYTES_PER_PIXEL];
+                _bitmap = new WriteableBitmap(_width, _height, Constants.DPI, Constants.DPI, Constants.FORMAT, null);
+            }
+
+            depthFrame.CopyFrameDataToArray(_depthData);
+            bodyIndexFrame.CopyFrameDataToArray(_bodyData);
+
+            // Convert the depth to RGB.
+            int colorIndex = 0;
+            for (int depthIndex = 0; depthIndex < _depthData.Length; ++depthIndex)
+            {
+                // Get the depth for this pixel
+                ushort depth = _depthData[depthIndex];
+                byte player = _bodyData[depthIndex];
+
+                // To convert to a byte, we're discarding the most-significant
+                // rather than least-significant bits.
+                // We're preserving detail, although the intensity will "wrap."
+                // Values outside the reliable depth range are mapped to 0 (black).
+                byte intensity = (byte)(depth >= minDepth && depth <= maxDepth ? depth : 0);
+
+                if (player != 0xff)
+                {
+                    // Color player gold.
+                    _pixels[colorIndex++] = Colors.Gold.B; // B
+                    _pixels[colorIndex++] = Colors.Gold.G; // G
+                    _pixels[colorIndex++] = Colors.Gold.R; // R
+                }
+                else
+                {
+                    // Color the rest of the image in grayscale.
+                    _pixels[colorIndex++] = (byte)(depth >= minDepth && depth <= maxDepth ? depth : 0);                                     // Blue
+                    _pixels[colorIndex++] = (byte)(depth >= minDepth && depth <= maxDepth ? depth / Constants.MAP_DEPTH_TO_BYTE : 0);       // Green
+                    _pixels[colorIndex++] = (byte)(depth >= minDepth && depth <= maxDepth ? depth / Constants.MAP_DEPTH_TO_BYTE : 0);       // Red
+                }
+
+                // We're outputting BGR, the last byte in the 32 bits is unused so skip it
+                // If we were outputting BGRA, we would write alpha here.
+                ++colorIndex;
+            }
+
+            _bitmap.Lock();
+
+            Marshal.Copy(_pixels, 0, _bitmap.BackBuffer, _pixels.Length);
+            _bitmap.AddDirtyRect(new Int32Rect(0, 0, _width, _height));
+
+            _bitmap.Unlock();
+
+            return _bitmap;
+        }
+
         #endregion
 
     }

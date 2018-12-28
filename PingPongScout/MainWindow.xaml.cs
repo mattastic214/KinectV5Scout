@@ -9,13 +9,12 @@ using System.Threading;
 using System.Linq;
 using KinectDataBase;
 using KinectConstantsBGRA;
-using Recorder;
 
 namespace PingPongScout
 {
     enum CameraType
     {
-        BodyIndex = 1,
+        Depth = 1,
         Infrared = 2,
         None = 3
     };
@@ -31,8 +30,7 @@ namespace PingPongScout
         #region CameraSettings
 
         readonly string FOLDER_PATH = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory + "../../", "video");
-        readonly CameraType cameraView = CameraType.BodyIndex;
-        VitruviusRecorder _recorder = new VitruviusRecorder();
+        readonly CameraType cameraView = CameraType.Depth;
         Visualization Visualization;
 
         #endregion
@@ -41,13 +39,11 @@ namespace PingPongScout
 
         Task depthTask = null;
         Task infraredTask = null;
-        Task bodyIndexTask = null;
         Task longExpTask = null;
         Task vitruviusTask = null;
         private CancellationTokenSource tokenSource = null;
 
         private DataBaseController DataBaseController = null;
-        private PlayerRecorder PlayerRecorder = null;
         private TimeSpan timeStamp;
         private KinectSensor _kinectSensor = null;
         private MultiSourceFrameReader _multiSourceFrameReader = null;
@@ -57,6 +53,9 @@ namespace PingPongScout
         private DepthBitmapGenerator _depthBitmapGenerator = null;
 
         private ushort[] _depthData = null;
+        private ushort[] _infraredData = null;
+        private byte[] _bodyIndexData = null;
+        private ushort[] _longExposureData = null;
 
         private IList<Body> _bodyData = null;
 
@@ -111,29 +110,17 @@ namespace PingPongScout
 
         private void InitializeFrameData(int depthWidth, int depthHeight)
         {
+            int depthArea = depthWidth * depthHeight;
+
             _bodyData = new Body[_kinectSensor.BodyFrameSource.BodyCount];
-            _depthData = new ushort[depthWidth * depthHeight];
+            _depthData = new ushort[depthArea];
+            _infraredData = new ushort[depthArea];
+            _bodyIndexData = new byte[depthArea];
         }
 
         private void InitializeDataAccessController()
         {
             DataBaseController = new DataBaseController();
-        }
-
-        private void ToggleRecorder()
-        {
-            if (_recorder.IsRecording)
-            {
-                _recorder.Stop();
-            }
-            else
-            {
-                _recorder.Clear();
-
-                _recorder.Visualization = this.Visualization;
-                _recorder.Folder = FOLDER_PATH;
-                _recorder.Start();
-            }
         }
 
         private void AssignConstructors(int depthWidth, int depthHeight)
@@ -143,13 +130,11 @@ namespace PingPongScout
             constructorOperation += (() => { InitializeBitmap(depthWidth, depthHeight); });
             constructorOperation += (() => { InitializeFrameData(depthWidth, depthHeight); });
             constructorOperation += InitializeDataAccessController;
-            constructorOperation += ToggleRecorder;
         }
 
         private void AssignEndOperations()
         {
             endOperation += CloseFrameAndKinect;
-            endOperation += ToggleRecorder;
         }
 
         #endregion
@@ -191,10 +176,8 @@ namespace PingPongScout
         private async void MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
         {
             MultiSourceFrame reference = e.FrameReference.AcquireFrame();
-            VitruviusFrame recordingFrame = new VitruviusFrame();
 
-            // COORDINATE MAPPING
-            if (reference != null && _recorder.IsRecording)
+            if (reference != null)
             {
                 tokenSource = new CancellationTokenSource();
                 CancellationToken token = tokenSource.Token;
@@ -208,16 +191,18 @@ namespace PingPongScout
                         timeStamp = depthFrame.RelativeTime;
                         _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
 
+                        _depthData = _depthBitmapGenerator.DepthData;
+                        _bodyIndexData = _depthBitmapGenerator.HighlightedPixels;
+
+
                         depthTask = DataBaseController.GetDepthData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator), token);
 
-                        bodyIndexTask = DataBaseController.GetBodyIndexData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator), token);
-
-                        if (cameraView == CameraType.BodyIndex)
+                        if (cameraView == CameraType.Depth)
                         {
-                            camera.Source = DepthExtensions.ToBitmap(depthFrame, bodyIndexFrame);
-                            recordingFrame.Image = _depthBitmapGenerator.Pixels;
+                            camera.Source = DepthExtensions.ToLayeredBitmap(depthFrame, bodyIndexFrame);
                         }
                     }
+                    
                 }
 
 
@@ -230,12 +215,20 @@ namespace PingPongScout
 
                         _infraredBitmapGenerator.Update(infraredFrame);
 
+                        _infraredData = _infraredBitmapGenerator.InfraredData;
+                        //_infraredData = _infraredBitmapGenerator.Pixels;
+
                         infraredTask = DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator), token);
 
                         using (var longExposureFrame = reference.LongExposureInfraredFrameReference.AcquireFrame())
                         {
                             if (longExposureFrame != null)
                             {
+                                // Crashes:
+                                // longExposureFrame.CopyFrameDataToArray(_longExposureData);
+                                // _longExposureData = _infraredBitmapGenerator.Pixels;
+                                // longExposureFrame.FrameDescription.BytesPerPixel;
+                                _longExposureData = _infraredBitmapGenerator.InfraredData;
                                 longExpTask = DataBaseController.GetLongExposureData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator), token);
                             }
                         }
@@ -243,7 +236,6 @@ namespace PingPongScout
                         if (cameraView == CameraType.Infrared)
                         {
                             camera.Source = InfraredExtensions.ToBitmap(infraredFrame);
-                            recordingFrame.Image = _infraredBitmapGenerator.Pixels;
                         }
                     }
                 }
@@ -256,21 +248,19 @@ namespace PingPongScout
                         bodyFrame.GetAndRefreshBodyData(_bodyData);
                         timeStamp = bodyFrame.RelativeTime;
 
-
                         var bodyData = BodyWrapper.Create(_bodyData
                                                         .Where(b => b.IsTracked)
                                                         .Closest(), _coordinateMapper, this.Visualization);
 
                         vitruviusTask = DataBaseController.GetVitruviusSingleData(new KeyValuePair<TimeSpan, BodyWrapper>(timeStamp, bodyData), token);
-                        recordingFrame.Body = bodyData;
                     }
                 }
+
 
                 try
                 {
                     if (depthTask != null) { await depthTask; depthTask = null; }
                     if (infraredTask != null) { await infraredTask; infraredTask = null; }
-                    if (bodyIndexTask != null) { await bodyIndexTask; bodyIndexTask = null; }
                     if (longExpTask != null) { await longExpTask; longExpTask = null; }
                     if (vitruviusTask != null) { await vitruviusTask; vitruviusTask = null; }
                 }
@@ -278,8 +268,6 @@ namespace PingPongScout
                 {
                     Console.WriteLine(oce.Message);
                 }
-
-                _recorder.AddFrame(recordingFrame);
             }
         }
 

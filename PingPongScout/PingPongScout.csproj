@@ -136,10 +136,6 @@
       <Project>{487a8c49-c902-4ec1-bc66-c00ef83c1d3a}</Project>
       <Name>KinectDataBase</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Recorder\Recorder.csproj">
-      <Project>{7502fdf2-22a8-4dd9-9f87-85b8fc59a4b3}</Project>
-      <Name>Recorder</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="stdole">

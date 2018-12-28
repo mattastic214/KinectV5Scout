@@ -90,21 +90,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="KinectDataOutput\BodyIndex.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="KinectDataOutput\DepthData.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="KinectDataOutput\InfraredData.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="KinectDataOutput\DepthBitmap.bmp" />
-    <Content Include="KinectDataOutput\LongExposureData.txt" />
+    <Content Include="KinectDataOutput\bodyIndex\BodyIndex.bmp" />
+    <Content Include="KinectDataOutput\depth\Depth.bmp" />
+    <Content Include="KinectDataOutput\infra\Infrared.bmp" />
+    <Content Include="KinectDataOutput\longExp\LongExposure.bmp" />
+    <Content Include="KinectDataOutput\Vitruvius.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="KinectDataOutput\Vitruvius.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
