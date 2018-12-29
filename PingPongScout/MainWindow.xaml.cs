@@ -35,13 +35,17 @@ namespace PingPongScout
 
         #endregion
 
-        #region Members
+        #region Tasks
 
         Task depthTask = null;
         Task infraredTask = null;
         Task longExpTask = null;
         Task vitruviusTask = null;
         private CancellationTokenSource tokenSource = null;
+
+        #endregion
+
+        #region Members
 
         private DataBaseController DataBaseController = null;
         private TimeSpan timeStamp;
@@ -56,6 +60,10 @@ namespace PingPongScout
         private ushort[] _infraredData = null;
         private byte[] _bodyIndexData = null;
         private ushort[] _longExposureData = null;
+
+        private byte[] _depthPixels = null;
+        private byte[] _bodyIndexPixels = null;
+        private byte[] _infraredPixels = null;
 
         private IList<Body> _bodyData = null;
 
@@ -104,8 +112,15 @@ namespace PingPongScout
 
         private void InitializeBitmap(int depthWidth, int depthHeight)
         {
+            int pixelSizeInBytes = depthHeight * depthWidth * 32;
+
             _infraredBitmapGenerator = new InfraredBitmapGenerator();
             _depthBitmapGenerator = new DepthBitmapGenerator();
+
+            _infraredPixels = new byte[pixelSizeInBytes];
+            _depthPixels = new byte[pixelSizeInBytes];
+            _bodyIndexPixels = new byte[pixelSizeInBytes];
+
         }
 
         private void InitializeFrameData(int depthWidth, int depthHeight)
@@ -182,7 +197,6 @@ namespace PingPongScout
                 tokenSource = new CancellationTokenSource();
                 CancellationToken token = tokenSource.Token;
 
-                // New Task 1:
                 using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
                 using (var bodyIndexFrame = reference.BodyIndexFrameReference.AcquireFrame())
                 {
@@ -192,7 +206,7 @@ namespace PingPongScout
                         _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
 
                         _depthData = _depthBitmapGenerator.DepthData;
-                        _bodyIndexData = _depthBitmapGenerator.HighlightedPixels;
+                        _bodyIndexData = _depthBitmapGenerator.BodyData;
 
 
                         depthTask = DataBaseController.GetDepthData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator), token);
@@ -200,13 +214,15 @@ namespace PingPongScout
                         if (cameraView == CameraType.Depth)
                         {
                             camera.Source = DepthExtensions.ToLayeredBitmap(depthFrame, bodyIndexFrame);
+
+                            _depthPixels = _depthBitmapGenerator.Pixels;
+                            _bodyIndexPixels = _depthBitmapGenerator.HighlightedPixels;
                         }
                     }
                     
                 }
 
 
-                // New Task 2:
                 using (var infraredFrame = reference.InfraredFrameReference.AcquireFrame())
                 {
                     if (infraredFrame != null)
@@ -216,7 +232,6 @@ namespace PingPongScout
                         _infraredBitmapGenerator.Update(infraredFrame);
 
                         _infraredData = _infraredBitmapGenerator.InfraredData;
-                        //_infraredData = _infraredBitmapGenerator.Pixels;
 
                         infraredTask = DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator), token);
 
@@ -224,10 +239,6 @@ namespace PingPongScout
                         {
                             if (longExposureFrame != null)
                             {
-                                // Crashes:
-                                // longExposureFrame.CopyFrameDataToArray(_longExposureData);
-                                // _longExposureData = _infraredBitmapGenerator.Pixels;
-                                // longExposureFrame.FrameDescription.BytesPerPixel;
                                 _longExposureData = _infraredBitmapGenerator.InfraredData;
                                 longExpTask = DataBaseController.GetLongExposureData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator), token);
                             }
@@ -236,11 +247,12 @@ namespace PingPongScout
                         if (cameraView == CameraType.Infrared)
                         {
                             camera.Source = InfraredExtensions.ToBitmap(infraredFrame);
+
+                            _infraredPixels = _infraredBitmapGenerator.Pixels;
                         }
                     }
                 }
 
-                // New Task 3:
                 using (var bodyFrame = reference.BodyFrameReference.AcquireFrame())
                 {
                     if (bodyFrame != null)

@@ -9,5 +9,9 @@ namespace KinectDataBase.Interfaces.Controllers
     public interface IInfraredDataController
     {
         Task GetInfraredData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData, CancellationToken token);
+
+        Task GetInfrardData(ushort[] infraredData, CancellationToken token);
+
+        Task GetInfraredPixels(byte[] infraredPixels, CancellationToken token);
     }
 }

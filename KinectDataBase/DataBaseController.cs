@@ -52,5 +52,40 @@ namespace KinectDataBase
         {
             return DataBaseAccess.WriteVitruviusSingle(bodyWrapper, token, DataBaseConstants.BasePath + DataBaseConstants.vitruviusPath);
         }
+
+        public Task GetDepthData(ushort[] depthData, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GetDepthPixels(byte[] depthPixels, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GetBodyIndexData(byte[] bodyIndexData, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GetBodyIndexPixels(byte[] bodyIndexPixels, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GetInfrardData(ushort[] infraredData, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GetInfraredPixels(byte[] infraredPixels, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GetLongExposureData(ushort[] longExposureData, CancellationToken token)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

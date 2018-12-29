@@ -37,6 +37,11 @@ namespace KinectDataBase
             return t;
         }
 
+        public Task WriteBodyIndexDataToDataBase(byte[] bodyIndexData, CancellationToken token, string path)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task WriteDepthDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> depthData, CancellationToken token, string path)
         {
             Task t = Task.Run(() =>
@@ -53,6 +58,11 @@ namespace KinectDataBase
             }, token);
 
             return t;
+        }
+
+        public Task WriteDepthDataToDataBase(ushort[] depthData, CancellationToken token, string path)
+        {
+            throw new NotImplementedException();
         }
 
         public Task WriteInfraredDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData, CancellationToken token, string path)
@@ -73,6 +83,11 @@ namespace KinectDataBase
             return t;
         }
 
+        public Task WriteInfraredDataToDataBase(ushort[] infraredData, CancellationToken token, string path)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task WriteLongExposureDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData, CancellationToken token, string path)
         {
             Task t = Task.Run(() =>
@@ -89,6 +104,11 @@ namespace KinectDataBase
             }, token);
 
             return t;
+        }
+
+        public Task WriteLongExposureDataToDataBase(ushort[] longExposureData, CancellationToken token, string path)
+        {
+            throw new NotImplementedException();
         }
 
         public Task WriteVitruviusSingle(KeyValuePair<TimeSpan, BodyWrapper> bodyWrapper, CancellationToken token, string path)

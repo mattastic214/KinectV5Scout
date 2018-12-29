@@ -10,11 +10,19 @@ namespace KinectDataBase.Interfaces.Access
     {
         Task WriteDepthDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> depthData, CancellationToken token, string path);
 
+        Task WriteDepthDataToDataBase(ushort[] depthData, CancellationToken token, string path);
+
         Task WriteInfraredDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData, CancellationToken token, string path);
+
+        Task WriteInfraredDataToDataBase(ushort[] infraredData, CancellationToken token, string path);
 
         Task WriteLongExposureDataToDataBase(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData, CancellationToken token, string path);
 
+        Task WriteLongExposureDataToDataBase(ushort[] longExposureData, CancellationToken token, string path);
+
         Task WriteBodyIndexDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData, CancellationToken token, string path);
+
+        Task WriteBodyIndexDataToDataBase(byte[] bodyIndexData, CancellationToken token, string path);
 
     }
 }

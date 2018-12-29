@@ -1,4 +1,9 @@
-﻿using Microsoft.Kinect;
+﻿/**
+ *  Tutorial from @Vangos Pterneas https://github.com/Vangos/kinect-2-coordinate-mapping
+ *  MIT License
+**/
+
+using Microsoft.Kinect;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media;

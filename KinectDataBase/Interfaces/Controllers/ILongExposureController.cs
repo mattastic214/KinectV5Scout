@@ -9,5 +9,7 @@ namespace KinectDataBase.Interfaces.Controllers
     public interface ILongExposureController
     {
         Task GetLongExposureData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData, CancellationToken token);
+
+        Task GetLongExposureData(ushort[] longExposureData, CancellationToken token);
     }
 }

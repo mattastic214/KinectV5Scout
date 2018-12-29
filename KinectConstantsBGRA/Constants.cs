@@ -1,4 +1,9 @@
-﻿using System.Windows.Media;
+﻿/**
+ *  Tutorial from @Vangos Pterneas https://github.com/Vangos/kinect-2-coordinate-mapping
+ *  MIT License
+**/
+
+using System.Windows.Media;
 
 namespace KinectConstantsBGRA
 {
