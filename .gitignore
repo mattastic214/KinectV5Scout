@@ -5,6 +5,7 @@ KinectDataBase/KinectDataOutput/
 Diagnostics/
 SampleData/
 SessionWriter/data/
+*.diagsession
 *.bin
 
 # User-specific files
