@@ -6,13 +6,16 @@ namespace KinectDataBase
     {
         #region Constants
 
-        public string BasePath { get; } = @"..\..\..\KinectDataBase\KinectDataOutput\";
-        public string bodyIndexPath { get; } = @"bodyIndex\BodyIndex.bmp";
-        public string depthDataPath { get; } = @"depth\Depth.bmp";
-        public string infraredDataPath { get; } = @"infra\Infrared.bmp";
-        public string longExposureDataPath { get; } = @"longExp\LongExposure.bmp";
-        public string vitruviusPath { get; } = @"Vitruvius.txt";
+        // Dictionary? A key value pair of names and associated file paths...
 
+
+        public string bodyIndexPath { get; } = @"\bodyIndex\BodyIndex.txt";
+        public string depthDataPath { get; } = @"\depth\Depth.txt";
+        public string infraredDataPath { get; } = @"\infra\Infrared.txt";
+        public string longExposureDataPath { get; } = @"\longExp\LongExposure.txt";
+        public string vitruviusPath { get; } = @"\Vitruvius.txt";
+
+        public readonly Dictionary<string, string> fileNames = null;
         public readonly List<string> dbConstants = new List<string>();
 
         public DataBaseConstants()
@@ -22,6 +25,15 @@ namespace KinectDataBase
             dbConstants.Add(infraredDataPath);
             dbConstants.Add(longExposureDataPath);
             dbConstants.Add(vitruviusPath);
+        }
+
+        public DataBaseConstants(DataBaseConstants dataBaseConstants)
+        {
+            this.dbConstants.Add(dataBaseConstants.bodyIndexPath);
+            this.dbConstants.Add(dataBaseConstants.depthDataPath);
+            this.dbConstants.Add(dataBaseConstants.infraredDataPath);
+            this.dbConstants.Add(dataBaseConstants.longExposureDataPath);
+            this.dbConstants.Add(dataBaseConstants.vitruviusPath);
         }
 
         #endregion
