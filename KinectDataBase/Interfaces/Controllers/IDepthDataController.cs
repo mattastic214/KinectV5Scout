@@ -8,10 +8,10 @@ namespace KinectDataBase.Interfaces.Controllers
 {
     public interface IDepthDataController
     {
-        Task GetDepthData(KeyValuePair<TimeSpan, DepthBitmapGenerator> depthData, CancellationToken token);
+        Task GetDepthData(KeyValuePair<TimeSpan, DepthBitmapGenerator> depthData, CancellationToken token, string rootPath);
 
-        Task GetDepthData(ushort[] depthData, CancellationToken token);
+        Task GetDepthData(ushort[] depthData, CancellationToken token, string rootPath);
 
-        Task GetDepthPixels(byte[] depthPixels, CancellationToken token);
+        Task GetDepthPixels(byte[] depthPixels, CancellationToken token, string rootPath);
     }
 }

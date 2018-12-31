@@ -8,6 +8,6 @@ namespace KinectDataBase.Interfaces.Controllers
 {
     public interface IJsonController
     {
-        Task GetVitruviusData(KeyValuePair<TimeSpan, IEnumerable<Body>> bodyWrapper, CancellationToken token);
+        Task GetVitruviusData(KeyValuePair<TimeSpan, IEnumerable<Body>> bodyWrapper, CancellationToken token, string rootPath);
     }
 }

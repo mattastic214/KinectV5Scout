@@ -4,6 +4,7 @@
 KinectDataBase/KinectDataOutput/
 Diagnostics/
 SampleData/
+SessionWriter/data/
 *.bin
 
 # User-specific files
@@ -269,3 +270,5 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+*.diagsession
+/SessionWriter/Lib

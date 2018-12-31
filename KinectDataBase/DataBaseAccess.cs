@@ -24,13 +24,12 @@ namespace KinectDataBase
             {
                 lock (fileLock)
                 {
-                    bodyIndexData.Value.HighlightedBitmap.Save(path);
-                    
-                    //using (StreamWriter str = File.AppendText(path))
-                    //{
-                    //    //str.WriteLine("BodyIndex data TimeStamp: " + bodyIndexData.Key + ", Value: " + bodyIndexData.Value.Bitmap + "\n");
-                    //    //bodyIndexData.Value.HighlightedPixels;
-                    //}
+                    //bodyIndexData.Value.HighlightedBitmap.Save(path);
+
+                    using (StreamWriter str = File.AppendText(path))
+                    {
+                        str.WriteLine("BodyIndex data TimeStamp: " + bodyIndexData.Key + ", Value: " + bodyIndexData.Value.Bitmap + "\n");
+                    }
                 }
             }, token);
 
@@ -48,12 +47,11 @@ namespace KinectDataBase
             {
                 lock (fileLock)
                 {
-                    depthData.Value.Bitmap.Save(path);
-                    //using (StreamWriter str = File.AppendText(path))
-                    //{
-                    //    //str.WriteLine("Depth data TimeStamp: " + depthData.Key + ", Value: " + depthData.Value.Bitmap + "\n");
-                        
-                    //}
+                    //depthData.Value.Bitmap.Save(path);
+                    using (StreamWriter str = File.AppendText(path))
+                    {
+                        str.WriteLine("Depth data TimeStamp: " + depthData.Key + ", Value: " + depthData.Value.Bitmap + "\n");
+                    }
                 }
             }, token);
 
@@ -71,12 +69,11 @@ namespace KinectDataBase
             {
                 lock (fileLock)
                 {
-                    infraredData.Value.Bitmap.Save(path);
-                    //using (StreamWriter str = File.AppendText(path))
-                    //{
-                    //    //str.WriteLine("Infrared data TimeStamp: " + infraredData.Key + ", Value: " + infraredData.Value.InfraredData[34] + "\n");
-                        
-                    //}
+                    //infraredData.Value.Bitmap.Save(path);
+                    using (StreamWriter str = File.AppendText(path))
+                    {
+                        str.WriteLine("Infrared data TimeStamp: " + infraredData.Key + ", Value: " + infraredData.Value.InfraredData[34] + "\n");
+                    }
                 }
             }, token);
 
@@ -95,11 +92,10 @@ namespace KinectDataBase
                 lock (fileLock)
                 {
                     longExposureData.Value.Bitmap.Save(path);
-                    //using (StreamWriter str = File.AppendText(path))
-                    //{
-                    //    //str.WriteLine("LongExposure data TimeStamp: " + longExposureData.Key + ", Value: " + longExposureData.Value.InfraredData.GetValue(8) + "\n");
-                        
-                    //}
+                    using (StreamWriter str = File.AppendText(path))
+                    {
+                        str.WriteLine("LongExposure data TimeStamp: " + longExposureData.Key + ", Value: " + longExposureData.Value.InfraredData.GetValue(8) + "\n");
+                    }
                 }
             }, token);
 

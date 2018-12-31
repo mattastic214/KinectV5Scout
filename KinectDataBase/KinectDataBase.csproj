@@ -91,10 +91,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="KinectDataOutput\bodyIndex\BodyIndex.bmp" />
+    <Content Include="KinectDataOutput\bodyIndex\BodyIndex.txt" />
     <Content Include="KinectDataOutput\depth\Depth.bmp" />
+    <Content Include="KinectDataOutput\depth\Depth.txt" />
     <Content Include="KinectDataOutput\infra\Infrared.bmp" />
+    <Content Include="KinectDataOutput\infra\Infrared.txt" />
     <Content Include="KinectDataOutput\longExp\LongExposure.bmp" />
-    <Content Include="KinectDataOutput\Vitruvius.txt" />
+    <Content Include="KinectDataOutput\longExp\LongExposure.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
