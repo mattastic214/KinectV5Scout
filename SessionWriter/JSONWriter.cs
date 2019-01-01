@@ -1,23 +1,29 @@
 ﻿using IronPython.Hosting;
 using Microsoft.Scripting.Hosting;
-
+using System;
+using System.Collections.Generic;
 
 namespace SessionWriter
 {
     public class JSONWriter
     {
-        public static void writeJSONSession(string rootPath, string dataPath)
+        public static void writeJSONSession()
         {
             ScriptEngine scriptEngine = Python.CreateEngine();
-            string[] libs = {
-                rootPath + @"\Lib",
-                rootPath + @"\Lib\json",
-                dataPath
-            };
+            ScriptSource source = scriptEngine.CreateScriptSourceFromFile(Constants.FilePathJsonParse);
+            ScriptScope scope = scriptEngine.CreateScope();
+            List<String> argv = new List<String>();
+            argv.Add(Constants.FilePathVitruvius);
 
+            string[] libs = {
+                "../../../SessionWriter/Lib",
+                "../../../SessionWriter/Lib/json",
+                "../../../SessionWriter/data"
+            };
+            scriptEngine.GetSysModule().SetVariable("argv", argv);
             scriptEngine.SetSearchPaths(libs);
 
-            scriptEngine.ExecuteFile(rootPath + @"/jsonParse.py");
+            source.Execute(scope);
         }
     }
 }

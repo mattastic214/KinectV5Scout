@@ -76,33 +76,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataBaseAccess.cs" />
-    <Compile Include="DataBaseConstants.cs" />
-    <Compile Include="Interfaces\Access\IVitruviusEnumerAccess.cs" />
-    <Compile Include="Interfaces\Access\IVitruviusSingleAccess.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Interfaces\Controllers\IBodyIndexController.cs" />
     <Compile Include="Interfaces\Controllers\IDepthDataController.cs" />
     <Compile Include="Interfaces\Controllers\IInfraredDataController.cs" />
-    <Compile Include="Interfaces\Controllers\IJsonController.cs" />
-    <Compile Include="Interfaces\Controllers\IJsonSingleController.cs" />
     <Compile Include="Interfaces\Controllers\ILongExposureController.cs" />
     <Compile Include="Interfaces\Access\IDataBaseAccess.cs" />
     <Compile Include="DataBaseController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="KinectDataOutput\bodyIndex\BodyIndex.bmp" />
-    <Content Include="KinectDataOutput\bodyIndex\BodyIndex.txt" />
-    <Content Include="KinectDataOutput\depth\Depth.bmp" />
-    <Content Include="KinectDataOutput\depth\Depth.txt" />
-    <Content Include="KinectDataOutput\infra\Infrared.bmp" />
-    <Content Include="KinectDataOutput\infra\Infrared.txt" />
-    <Content Include="KinectDataOutput\longExp\LongExposure.bmp" />
-    <Content Include="KinectDataOutput\longExp\LongExposure.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="KinectDataOutput\bodyIndex\" />
+    <Folder Include="KinectDataOutput\depth\" />
+    <Folder Include="KinectDataOutput\infra\" />
+    <Folder Include="KinectDataOutput\longExp\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -8,15 +8,15 @@ using KinectDataBase.Interfaces.Controllers;
 
 namespace KinectDataBase
 {
-    public class DataBaseController : IDepthDataController, IBodyIndexController, IInfraredDataController, ILongExposureController, IJsonSingleController
+    public class DataBaseController : IDepthDataController, IBodyIndexController, IInfraredDataController, ILongExposureController
     {
         private DataBaseAccess DataBaseAccess { get; } = null;
-        private DataBaseConstants DataBaseConstants { get; } = null;
+        private Constants DataBaseConstants { get; } = null;
 
         public DataBaseController(string pathRoot)
         {
             DataBaseAccess = new DataBaseAccess();
-            DataBaseConstants = new DataBaseConstants();
+            DataBaseConstants = new Constants();
 
             foreach (string file in DataBaseConstants.dbConstants)
             {
@@ -28,62 +28,71 @@ namespace KinectDataBase
             }
         }
 
-        public Task GetDepthData(KeyValuePair<TimeSpan, DepthBitmapGenerator> depthData, CancellationToken token, string rootPath)
+        public DataBaseController(ICollection<string> paths, DataBaseAccess dataBaseAccess)
         {
-            return DataBaseAccess.WriteDepthDataToDataBase(depthData, token, rootPath + DataBaseConstants.depthDataPath);
+            DataBaseAccess = dataBaseAccess;
+
+            foreach (string path in paths)
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                    File.Create(path);
+                }
+            }
         }
 
-        public Task GetBodyIndexData(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData, CancellationToken token, string rootPath)
+        public Task GetDepthData(KeyValuePair<TimeSpan, DepthBitmapGenerator> depthData, CancellationToken token, string path)
         {
-            return DataBaseAccess.WriteBodyIndexDataToDataBase(bodyIndexData, token, rootPath + DataBaseConstants.bodyIndexPath);
+            return DataBaseAccess.WriteDepthDataToDataBase(depthData, token, path);
         }
 
-        public Task GetInfraredData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData, CancellationToken token, string rootPath)
+        public Task GetBodyIndexData(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData, CancellationToken token, string path)
         {
-            return DataBaseAccess.WriteInfraredDataToDataBase(infraredData, token, rootPath + DataBaseConstants.infraredDataPath);
+            return DataBaseAccess.WriteBodyIndexDataToDataBase(bodyIndexData, token, path);
         }
 
-        public Task GetLongExposureData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData, CancellationToken token, string rootPath)
+        public Task GetInfraredData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> infraredData, CancellationToken token, string path)
         {
-            return DataBaseAccess.WriteLongExposureDataToDataBase(longExposureData, token, rootPath + DataBaseConstants.longExposureDataPath);
+            return DataBaseAccess.WriteInfraredDataToDataBase(infraredData, token, path);
         }
 
-        public Task GetVitruviusSingleData(KeyValuePair<TimeSpan, BodyWrapper> bodyWrapper, CancellationToken token, string rootPath)
+        public Task GetLongExposureData(KeyValuePair<TimeSpan, InfraredBitmapGenerator> longExposureData, CancellationToken token, string path)
         {
-            return DataBaseAccess.WriteVitruviusSingle(bodyWrapper, token, rootPath + DataBaseConstants.vitruviusPath);
+            return DataBaseAccess.WriteLongExposureDataToDataBase(longExposureData, token, path);
         }
 
-        public Task GetDepthData(ushort[] depthData, CancellationToken token, string rootPath)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task GetDepthPixels(byte[] depthPixels, CancellationToken token, string rootPath)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task GetBodyIndexData(byte[] bodyIndexData, CancellationToken token, string rootPath)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task GetBodyIndexPixels(byte[] bodyIndexPixels, CancellationToken token, string rootPath)
+        public Task GetDepthData(ushort[] depthData, CancellationToken token, string path)
         {
             throw new NotImplementedException();
         }
 
-        public Task GetInfrardData(ushort[] infraredData, CancellationToken token, string rootPath)
+        public Task GetDepthPixels(byte[] depthPixels, CancellationToken token, string path)
         {
             throw new NotImplementedException();
         }
 
-        public Task GetInfraredPixels(byte[] infraredPixels, CancellationToken token, string rootPath)
+        public Task GetBodyIndexData(byte[] bodyIndexData, CancellationToken token, string path)
         {
             throw new NotImplementedException();
         }
 
-        public Task GetLongExposureData(ushort[] longExposureData, CancellationToken token, string rootPath)
+        public Task GetBodyIndexPixels(byte[] bodyIndexPixels, CancellationToken token, string path)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GetInfrardData(ushort[] infraredData, CancellationToken token, string path)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GetInfraredPixels(byte[] infraredPixels, CancellationToken token, string path)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task GetLongExposureData(ushort[] longExposureData, CancellationToken token, string path)
         {
             throw new NotImplementedException();
         }

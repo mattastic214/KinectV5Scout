@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 using System.Collections.Generic;
 using Microsoft.Kinect;
@@ -30,9 +31,7 @@ namespace PingPongScout
 
         #region CameraSettings
 
-        readonly string SESSION_WRITER_PATH_ROOT = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory + "../../..", "SessionWriter/");
-        readonly string SESSION_WRITER_DATA_STORE = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory + "../../..", "SessionWriter/data");
-        readonly string KINECT_PATH = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory + "../../..", "KinectDataBase/KinectDataOutput");
+        readonly string FRAME_DATA_PATH = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + "../../..", "KinectDataBase/KinectDataOutput");
         readonly CameraType cameraView = CameraType.Depth;
         Visualization Visualization;
 
@@ -44,13 +43,23 @@ namespace PingPongScout
         Task infraredTask = null;
         Task longExpTask = null;
         Task vitruviusTask = null;
+        Task quarternionTask = null;
         private CancellationTokenSource tokenSource = null;
 
         #endregion
 
         #region Members
 
+        string[] filePaths =
+        {
+            @"../../../KinectDataBase/KinectDataOutput/depth/Depth.txt",
+            @"../../../KinectDataBase/KinectDataOutput/bodyIndex/BodyIndex.txt",
+            @"../../../KinectDataBase/KinectDataOutput/infra/Infrared.txt",
+            @"../../../KinectDataBase/KinectDataOutput/longExp/LongExposure.txt",
+        };
+
         private DataBaseController DataBaseController = null;
+        private SessionController SessionController = null;
         private TimeSpan timeStamp;
         private KinectSensor _kinectSensor = null;
         private MultiSourceFrameReader _multiSourceFrameReader = null;
@@ -136,14 +145,15 @@ namespace PingPongScout
             _bodyIndexData = new byte[depthArea];
         }
 
-        private void InitializeDataAccessController()
+        private void InitializeControllers()
         {
-            DataBaseController = new DataBaseController(KINECT_PATH);
+            DataBaseController = new DataBaseController(filePaths, new DataBaseAccess());
+            SessionController = new SessionController();
         }
 
         private void WriteJSON()
         {
-            JSONWriter.writeJSONSession(SESSION_WRITER_PATH_ROOT, SESSION_WRITER_DATA_STORE);
+            JSONWriter.writeJSONSession();
         }
 
         private void AssignConstructors(int depthWidth, int depthHeight)
@@ -152,7 +162,7 @@ namespace PingPongScout
             constructorOperation += InitializeMultiSourceReader;
             constructorOperation += (() => { InitializeBitmap(depthWidth, depthHeight); });
             constructorOperation += (() => { InitializeFrameData(depthWidth, depthHeight); });
-            constructorOperation += InitializeDataAccessController;
+            constructorOperation += InitializeControllers;
         }
 
         private void AssignEndOperations()
@@ -218,7 +228,7 @@ namespace PingPongScout
                         _bodyIndexData = _depthBitmapGenerator.BodyData;
 
 
-                        depthTask = DataBaseController.GetDepthData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator), token, KINECT_PATH);
+                        depthTask = DataBaseController.GetDepthData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator), token, FRAME_DATA_PATH + filePaths[0]);
 
                         if (cameraView == CameraType.Depth)
                         {
@@ -242,14 +252,14 @@ namespace PingPongScout
 
                         _infraredData = _infraredBitmapGenerator.InfraredData;
 
-                        infraredTask = DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator), token, KINECT_PATH);
+                        infraredTask = DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator), token, FRAME_DATA_PATH + filePaths[2]);
 
                         using (var longExposureFrame = reference.LongExposureInfraredFrameReference.AcquireFrame())
                         {
                             if (longExposureFrame != null)
                             {
                                 _longExposureData = _infraredBitmapGenerator.InfraredData;
-                                longExpTask = DataBaseController.GetLongExposureData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator), token, KINECT_PATH);
+                                longExpTask = DataBaseController.GetLongExposureData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator), token, FRAME_DATA_PATH + filePaths[3]);
                             }
                         }
 
@@ -273,7 +283,7 @@ namespace PingPongScout
                                                         .Where(b => b.IsTracked)
                                                         .Closest(), _coordinateMapper, this.Visualization);
 
-                        vitruviusTask = DataBaseController.GetVitruviusSingleData(new KeyValuePair<TimeSpan, BodyWrapper>(timeStamp, bodyData), token, SESSION_WRITER_DATA_STORE);
+                        vitruviusTask = SessionController.GetVitruviusSingleData(new KeyValuePair<TimeSpan, BodyWrapper>(timeStamp, bodyData), token);
                     }
                 }
 
@@ -284,6 +294,7 @@ namespace PingPongScout
                     if (infraredTask != null) { await infraredTask; infraredTask = null; }
                     if (longExpTask != null) { await longExpTask; longExpTask = null; }
                     if (vitruviusTask != null) { await vitruviusTask; vitruviusTask = null; }
+                    if (quarternionTask != null) { await quarternionTask; quarternionTask = null; }
                 }
                 catch (OperationCanceledException oce)
                 {

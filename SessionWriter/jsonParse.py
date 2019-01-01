@@ -3,6 +3,13 @@ import json
 import re
 from datetime import datetime
 
+inputFile = sys.argv[0]
+print(sys.argv[0])
+
+textFileExt = '.txt'
+jsonFileExt = '.json'
+
+
 sessionStart = '{"RecordingDate":'
 applyDateTime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 recordingStart = ',"RecordingSession":['
@@ -22,22 +29,12 @@ replaceTrue = 'true'
 replaceFalse = 'false'
 
 searches = [beginningComma, matchQuote, matchBrackets, matchTrue, matchFalse]    
-#finds = []
-#searchResults = []
-
 
 
 replacements = [longStart, replaceQuote, replaceBrackets, replaceTrue, replaceFalse]
 
-with open('../../../SessionWriter/data/Vitruvius.txt') as f:
+with open(inputFile) as f:
     bodytext = f.read()
-
-#for search in searches:
-#    finds.append(re.search(search, bodytext))
-    
-#for find in finds:
-#    searchResults.append(re.compile(find[0]))
-
 
 commaSearch = re.compile(beginningComma)
 quoteSearch = re.compile(matchQuote)
@@ -53,15 +50,14 @@ finalText = trueSearch.sub(replaceTrue, finalText)
 finalText = falseSearch.sub(replaceFalse, finalText)
 finalText = finalText + sessionEnd
 
-with open('../../../SessionWriter/data/longVit.txt', 'w') as f:
-    f.write(finalText)
     
 vitInMemJson = json.loads(finalText)
 
-with open('../../../SessionWriter/data/vitConvert.json', 'w') as f:
+extSearch = re.compile(textFileExt)
+outputFile = extSearch.sub(jsonFileExt, inputFile)
+
+with open(outputFile, 'w') as f:
     f.write(finalText)
     
 vitRecordSession = vitInMemJson['RecordingDate']
-#vitFrames = vitInMemJson['RecordingSession']
-
 print(vitRecordSession)

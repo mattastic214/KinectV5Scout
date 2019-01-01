@@ -12,11 +12,11 @@ using Microsoft.Kinect;
 
 namespace KinectDataBase
 {
-    public class DataBaseAccess : IDataBaseAccess, IVitruviusSingleAccess
+    public class DataBaseAccess : IDataBaseAccess
     {        
         private readonly object fileLock = new object();
         StringBuilder sb = new StringBuilder();
-        DataBaseConstants db = new DataBaseConstants();
+        Constants db = new Constants();
 
         public Task WriteBodyIndexDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData, CancellationToken token, string path)
         {
@@ -105,37 +105,6 @@ namespace KinectDataBase
         public Task WriteLongExposureDataToDataBase(ushort[] longExposureData, CancellationToken token, string path)
         {
             throw new NotImplementedException();
-        }
-
-        public Task WriteVitruviusSingle(KeyValuePair<TimeSpan, BodyWrapper> bodyWrapper, CancellationToken token, string path)
-        {
-            TimeSpan time = bodyWrapper.Key;
-            BodyWrapper body = bodyWrapper.Value;
-
-            Task t = Task.Run(() =>
-            {
-                lock (fileLock)
-                {
-                    using (StreamWriter str = File.AppendText(path))
-                    using (StringWriter strwtr = new StringWriter(sb))
-                    using (JsonTextWriter writer = new JsonTextWriter(strwtr))
-                    {
-                        writer.WriteRaw(",");
-
-                        writer.WriteStartObject();
-                        writer.WritePropertyName("RelativeTime");
-                        writer.WriteValue(time);
-                        writer.WritePropertyName("TrackedPlayer");
-
-                        writer.WriteRawValue(body.ToJSON());
-                        writer.WriteEndObject();
-                        str.Write(sb.ToString());
-                        sb.Clear();
-                    }
-                }
-            }, token);
-
-            return t;
         }
     }
 }

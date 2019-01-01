@@ -1,12 +1,12 @@
-﻿using LightBuzz.Vitruvius;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using LightBuzz.Vitruvius;
 
-namespace KinectDataBase.Interfaces.Access
+namespace SessionWriter.Interfaces.DataBaseAccess
 {
-    public interface IVitruviusSingleAccess
+    public interface IBodyWrapperAccess
     {
         Task WriteVitruviusSingle(KeyValuePair<TimeSpan, BodyWrapper> bodyWrapper, CancellationToken token, string path);
     }

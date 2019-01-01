@@ -43,14 +43,21 @@
     <Reference Include="IronPython.Wpf, Version=2.7.9.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
       <HintPath>..\packages\IronPython.2.7.9\lib\net45\IronPython.Wpf.dll</HintPath>
     </Reference>
+    <Reference Include="LightBuzz.Vitruvius">
+      <HintPath>..\..\..\assemblies\Vitruvius_(Premium)5.0.5\LightBuzz.Vitruvius.5.0.5\LightBuzz.Vitruvius.4.5.0-Legacy\Assemblies\WPF\LightBuzz.Vitruvius.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Dynamic, Version=1.2.2.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
       <HintPath>..\packages\DynamicLanguageRuntime.1.2.2\lib\net45\Microsoft.Dynamic.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Kinect, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="Microsoft.Scripting, Version=1.2.2.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
       <HintPath>..\packages\DynamicLanguageRuntime.1.2.2\lib\net45\Microsoft.Scripting.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Scripting.Metadata, Version=1.2.2.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
       <HintPath>..\packages\DynamicLanguageRuntime.1.2.2\lib\net45\Microsoft.Scripting.Metadata.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -62,12 +69,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants.cs" />
+    <Compile Include="Interfaces\API\IBodyWrapperController.cs" />
+    <Compile Include="Interfaces\DataBaseAccess\IBodyWrapperAccess.cs" />
     <Compile Include="JSONWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SessionController.cs" />
+    <Compile Include="SessionDataBase.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="data\longVit.txt" />
-    <Content Include="data\Vitruvius.txt" />
     <Content Include="jsonParse.py" />
     <Content Include="Lib\abc.py" />
     <Content Include="Lib\aifc.py" />
@@ -587,10 +597,12 @@
     <Content Include="Lib\__phello__.foo.py" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="data\vitConvert.json" />
     <None Include="Lib\ensurepip\_bundled\pip-8.1.1-py2.py3-none-any.whl" />
     <None Include="Lib\ensurepip\_bundled\setuptools-20.10.1-py2.py3-none-any.whl" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="data\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
