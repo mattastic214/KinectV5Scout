@@ -16,7 +16,7 @@ namespace KinectDataBase
     {        
         private readonly object fileLock = new object();
         StringBuilder sb = new StringBuilder();
-        Constants db = new Constants();
+        BitmapEncoder encoder = new PngBitmapEncoder();
 
         public Task WriteBodyIndexDataToDataBase(KeyValuePair<TimeSpan, DepthBitmapGenerator> bodyIndexData, CancellationToken token, string path)
         {
@@ -24,11 +24,25 @@ namespace KinectDataBase
             {
                 lock (fileLock)
                 {
-                    //bodyIndexData.Value.HighlightedBitmap.Save(path);
-
-                    using (StreamWriter str = File.AppendText(path))
+                    encoder.Frames.Add(BitmapFrame.Create(bodyIndexData.Value.Bitmap));
+                    string time = System.DateTime.Now.ToString("d MMM yyyy hh-mm-ss");
+                    string fullPath = Path.Combine(path, "ScreenShot" + time + ".png");
+                    try
                     {
-                        str.WriteLine("BodyIndex data TimeStamp: " + bodyIndexData.Key + ", Value: " + bodyIndexData.Value.Bitmap + "\n");
+                        //bodyIndexData.Value.HighlightedBitmap.Save(path);
+                        //using (StreamWriter str = File.AppendText(path))
+                        //{
+                        //    str.WriteLine("BodyIndex data TimeStamp: " + bodyIndexData.Key + ", Value: " + bodyIndexData.Value.Bitmap + "\n");
+                        //}
+                        using (FileStream fs = new FileStream(fullPath, FileMode.Create))
+                        {
+                            encoder.Save(fs);
+                            Console.WriteLine("Saving Pics");
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        Console.WriteLine(e.Message + " in WriteBodyIndexData.");
                     }
                 }
             }, token);
@@ -47,10 +61,17 @@ namespace KinectDataBase
             {
                 lock (fileLock)
                 {
-                    //depthData.Value.Bitmap.Save(path);
-                    using (StreamWriter str = File.AppendText(path))
+                    try
                     {
-                        str.WriteLine("Depth data TimeStamp: " + depthData.Key + ", Value: " + depthData.Value.Bitmap + "\n");
+                        //depthData.Value.Bitmap.Save(path);
+                        using (StreamWriter str = File.AppendText(path))
+                        {
+                            str.WriteLine("Depth data TimeStamp: " + depthData.Key + ", Value: " + depthData.Value.Bitmap + "\n");
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        Console.WriteLine(e.Message + " in write DepthData.");
                     }
                 }
             }, token);
@@ -69,10 +90,17 @@ namespace KinectDataBase
             {
                 lock (fileLock)
                 {
-                    //infraredData.Value.Bitmap.Save(path);
-                    using (StreamWriter str = File.AppendText(path))
+                    try
                     {
-                        str.WriteLine("Infrared data TimeStamp: " + infraredData.Key + ", Value: " + infraredData.Value.InfraredData[34] + "\n");
+                        //infraredData.Value.Bitmap.Save(path);
+                        using (StreamWriter str = File.AppendText(path))
+                        {
+                            str.WriteLine("Infrared data TimeStamp: " + infraredData.Key + ", Value: " + infraredData.Value.InfraredData[34] + "\n");
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        Console.WriteLine(e.Message + " in WriteInfraredData.");
                     }
                 }
             }, token);
@@ -91,10 +119,17 @@ namespace KinectDataBase
             {
                 lock (fileLock)
                 {
-                    longExposureData.Value.Bitmap.Save(path);
-                    using (StreamWriter str = File.AppendText(path))
+                    try
                     {
-                        str.WriteLine("LongExposure data TimeStamp: " + longExposureData.Key + ", Value: " + longExposureData.Value.InfraredData.GetValue(8) + "\n");
+                        longExposureData.Value.Bitmap.Save(path);
+                        using (StreamWriter str = File.AppendText(path))
+                        {
+                            str.WriteLine("LongExposure data TimeStamp: " + longExposureData.Key + ", Value: " + longExposureData.Value.InfraredData.GetValue(8) + "\n");
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        Console.WriteLine(e.Message + " in WriteLongExposureData.");
                     }
                 }
             }, token);

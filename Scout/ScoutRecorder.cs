@@ -11,24 +11,19 @@ using System.Linq;
 using KinectDataBase;
 using KinectConstantsBGRA;
 using SessionWriter;
-using System.Windows.Media.Imaging;
 
-namespace PingPongScout
+namespace Scout
 {
-    enum CameraType
+    public enum CameraType
     {
         Depth = 1,
         Infrared = 2,
         None = 3
     };
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// DepthFrame
-    /// BodyIndexFrame
-    /// Gets the highlighted BodyIndexFrame; cancels out table blocking the view of the body.
-    /// </summary>
-    public partial class MainWindow : Window
+
+    public class ScoutRecorder
     {
+        
 
         #region CameraSettings
 
@@ -54,7 +49,7 @@ namespace PingPongScout
         string[] filePaths =
         {
             @"../../../KinectDataBase/KinectDataOutput/depth/Depth.txt",
-            @"../../../KinectDataBase/KinectDataOutput/bodyIndex/BodyIndex.png",
+            @"../../../KinectDataBase/KinectDataOutput/bodyIndex/BodyIndex.txt",
             @"../../../KinectDataBase/KinectDataOutput/infra/Infrared.txt",
             @"../../../KinectDataBase/KinectDataOutput/longExp/LongExposure.txt",
         };
@@ -109,11 +104,29 @@ namespace PingPongScout
 
         #region Constructors
 
-        private void OpenKinect()
+        public ScoutRecorder(CameraType cameraType)
+        {
+            Visualization = cameraType == CameraType.Infrared ? Visualization.Infrared : Visualization.Depth;
+
+            _kinectSensor = KinectSensor.GetDefault();
+
+            if (_kinectSensor != null)
+            {
+                int depthWidth = _kinectSensor.DepthFrameSource.FrameDescription.Width;
+                int depthHeight = _kinectSensor.DepthFrameSource.FrameDescription.Height;
+
+                AssignConstructors(depthHeight, depthHeight);
+                AssignEndOperations();
+
+                constructorOperation();
+            }
+        }
+
+        public void OpenKinect() // Open Kinect then listen for events and record until asked to close.
         {
             _kinectSensor.Open();
             _coordinateMapper = _kinectSensor.CoordinateMapper;
-        }
+        } 
 
         private void InitializeMultiSourceReader()
         {
@@ -152,12 +165,12 @@ namespace PingPongScout
             SessionController = new SessionController();
         }
 
-        private void WriteJSON()
+        private void WriteJSON()      
         {
             JSONWriter.writeJSONSession();
         }
 
-        private void AssignConstructors(int depthWidth, int depthHeight)
+        private void AssignConstructors(int depthWidth, int depthHeight) 
         {
             constructorOperation += OpenKinect;
             constructorOperation += InitializeMultiSourceReader;
@@ -174,38 +187,11 @@ namespace PingPongScout
 
         #endregion
 
-        #region MainWindow
-
-        public MainWindow()
-        {
-            InitializeComponent();
-            WindowState = cameraView == CameraType.None ? WindowState.Minimized : WindowState.Maximized;
-            Visualization = cameraView == CameraType.Infrared ? Visualization.Infrared : Visualization.Depth;
-        }
-
-        #endregion
-
         #region EventHandlers
 
-        private void Window_Closed(object sender, EventArgs e)
+        private void Window_Closed(object sender, ConsoleCancelEventArgs e) // Notify when the Camera is done recording.
         {
             endOperation();
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            _kinectSensor = KinectSensor.GetDefault();
-
-            if (_kinectSensor != null)
-            {
-                int depthWidth = _kinectSensor.DepthFrameSource.FrameDescription.Width;
-                int depthHeight = _kinectSensor.DepthFrameSource.FrameDescription.Height;
-
-                AssignConstructors(depthHeight, depthHeight);
-                AssignEndOperations();
-
-                constructorOperation();
-            }
         }
 
         private async void MultiSourceFrameArrived(object sender, MultiSourceFrameArrivedEventArgs e)
@@ -233,13 +219,13 @@ namespace PingPongScout
 
                         if (cameraView == CameraType.Depth)
                         {
-                            camera.Source = DepthExtensions.ToLayeredBitmap(depthFrame, bodyIndexFrame);
+                            //camera.Source = DepthExtensions.ToLayeredBitmap(depthFrame, bodyIndexFrame);
 
                             _depthPixels = _depthBitmapGenerator.Pixels;
                             _bodyIndexPixels = _depthBitmapGenerator.HighlightedPixels;
                         }
                     }
-                    
+
                 }
 
 
@@ -252,7 +238,6 @@ namespace PingPongScout
                         _infraredBitmapGenerator.Update(infraredFrame);
 
                         _infraredData = _infraredBitmapGenerator.InfraredData;
-
 
                         infraredTask = DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator), token, FRAME_DATA_PATH + filePaths[2]);
 
@@ -267,7 +252,7 @@ namespace PingPongScout
 
                         if (cameraView == CameraType.Infrared)
                         {
-                            camera.Source = InfraredExtensions.ToBitmap(infraredFrame);
+                            //camera.Source = InfraredExtensions.ToBitmap(infraredFrame);
 
                             _infraredPixels = _infraredBitmapGenerator.Pixels;
                         }
@@ -289,6 +274,7 @@ namespace PingPongScout
                     }
                 }
 
+
                 try
                 {
                     if (depthTask != null) { await depthTask; depthTask = null; }
@@ -303,55 +289,6 @@ namespace PingPongScout
                 }
             }
         }
-
-        //private void ScreenshotButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    var frame = _kinectSensor.DepthFrameSource;
-            
-        //    // Then wait for the camera to give it one of its frames.
-            
-        //    using (var depthFrame = reference.DepthFrameReference.AcquireFrame())
-        //    {
-        //        string photoLoc = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-        //        string time = DateTime.Now.ToString("d MMM yyyy hh - mm - ss");
-        //        string path = Path.Combine(photoLoc, "Screenshot " + time + ".png");
-        //        Console.WriteLine("Path: " + path);
-
-        //        if (depthFrame != null)
-        //        {
-
-        //            BitmapEncoder encoder = new PngBitmapEncoder();
-
-        //            _depthBitmapGenerator.Update(depthFrame);
-
-        //            var pic = _depthBitmapGenerator.Bitmap;
-
-        //            encoder.Frames.Add(BitmapFrame.Create(pic));
-
-        //            try
-        //            {
-        //                using (FileStream fs = new FileStream(path, FileMode.Create))
-        //                {
-        //                    encoder.Save(fs);
-        //                }
-        //                Console.WriteLine("Picture was saved to: " + path);
-        //            }
-        //            catch (IOException x)
-        //            {
-        //                Console.WriteLine(x.Message);
-
-        //            }
-
-        //        }
-        //        else
-        //        {
-        //            Console.WriteLine("depthBitmap was null: " + (_depthBitmapGenerator.Bitmap == null) + " at " + path);
-        //        }
-        //    }
-
-               
-        //}
-
         #endregion
     }
 }

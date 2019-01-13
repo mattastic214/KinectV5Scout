@@ -25,21 +25,28 @@ namespace SessionWriter
             {
                 lock (fileLock)
                 {
-                    using (StreamWriter str = File.AppendText(path))
-                    using (StringWriter strwtr = new StringWriter(sb))
-                    using (JsonTextWriter writer = new JsonTextWriter(strwtr))
+                    try
                     {
-                        writer.WriteRaw(",");
+                        using (StreamWriter str = File.AppendText(path))
+                        using (StringWriter strwtr = new StringWriter(sb))
+                        using (JsonTextWriter writer = new JsonTextWriter(strwtr))
+                        {
+                            writer.WriteRaw(",");
 
-                        writer.WriteStartObject();
-                        writer.WritePropertyName("RelativeTime");
-                        writer.WriteValue(time);
-                        writer.WritePropertyName("TrackedPlayer");
+                            writer.WriteStartObject();
+                            writer.WritePropertyName("RelativeTime");
+                            writer.WriteValue(time);
+                            writer.WritePropertyName("TrackedPlayer");
 
-                        writer.WriteRawValue(body.ToJSON());
-                        writer.WriteEndObject();
-                        str.Write(sb.ToString());
-                        sb.Clear();
+                            writer.WriteRawValue(body.ToJSON());
+                            writer.WriteEndObject();
+                            str.Write(sb.ToString());
+                            sb.Clear();
+                        }
+                    }
+                    catch(IOException e)
+                    {
+                        Console.WriteLine(e.Message + " in SessionDataBase.cs");
                     }
                 }
             }, token);
