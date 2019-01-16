@@ -1,5 +1,6 @@
 import sys
 import json
+import pickle
 import re
 from datetime import datetime
 
@@ -8,6 +9,7 @@ print(sys.argv[0])
 
 textFileExt = '.txt'
 jsonFileExt = '.json'
+pickleFileExt = ".pickle"
 
 
 sessionStart = '{"RecordingDate":'
@@ -58,6 +60,9 @@ outputFile = extSearch.sub(jsonFileExt, inputFile)
 
 with open(outputFile, 'w') as f:
     f.write(finalText)
+
+with open("vitruvius.pickle", 'wb') as f:
+	pickle.dump(finalText, f)
     
 vitRecordSession = vitInMemJson['RecordingDate']
 print(vitRecordSession)

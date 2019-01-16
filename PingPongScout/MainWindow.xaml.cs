@@ -12,6 +12,7 @@ using KinectDataBase;
 using KinectConstantsBGRA;
 using SessionWriter;
 using System.Windows.Media.Imaging;
+using System.Windows.Media;
 
 namespace PingPongScout
 {
@@ -32,7 +33,7 @@ namespace PingPongScout
 
         #region CameraSettings
 
-        readonly string FRAME_DATA_PATH = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + "../../..", "KinectDataBase/KinectDataOutput");
+        readonly string FRAMEDATAPATH = Path.Combine(AppDomain.CurrentDomain.BaseDirectory + "../../..", "KinectDataBase/KinectDataOutput");
         readonly CameraType cameraView = CameraType.Depth;
         Visualization Visualization;
 
@@ -62,23 +63,23 @@ namespace PingPongScout
         private DataBaseController DataBaseController = null;
         private SessionController SessionController = null;
         private TimeSpan timeStamp;
-        private KinectSensor _kinectSensor = null;
-        private MultiSourceFrameReader _multiSourceFrameReader = null;
-        private CoordinateMapper _coordinateMapper = null;
+        private KinectSensor kinectSensor = null;
+        private MultiSourceFrameReader multiSourceFrameReader = null;
+        private CoordinateMapper coordinateMapper = null;
 
-        private InfraredBitmapGenerator _infraredBitmapGenerator = null;
-        private DepthBitmapGenerator _depthBitmapGenerator = null;
+        private InfraredBitmapGenerator infraredBitmapGenerator = null;
+        private DepthBitmapGenerator depthBitmapGenerator = null;
 
-        private ushort[] _depthData = null;
-        private ushort[] _infraredData = null;
-        private byte[] _bodyIndexData = null;
-        private ushort[] _longExposureData = null;
+        private ushort[] depthData = null;
+        private ushort[] infraredData = null;
+        private byte[] bodyIndexData = null;
+        private ushort[] longExposureData = null;
 
-        private byte[] _depthPixels = null;
-        private byte[] _bodyIndexPixels = null;
-        private byte[] _infraredPixels = null;
+        private byte[] depthPixels = null;
+        private byte[] bodyIndexPixels = null;
+        private byte[] infraredPixels = null;
 
-        private IList<Body> _bodyData = null;
+        private IList<Body> bodyData = null;
 
         #endregion
 
@@ -94,14 +95,14 @@ namespace PingPongScout
 
         private void CloseFrameAndKinect()
         {
-            if (_multiSourceFrameReader != null)
+            if (multiSourceFrameReader != null)
             {
-                _multiSourceFrameReader.Dispose();
+                multiSourceFrameReader.Dispose();
             }
 
-            if (_kinectSensor != null)
+            if (kinectSensor != null)
             {
-                _kinectSensor.Close();
+                kinectSensor.Close();
             }
         }
 
@@ -111,28 +112,28 @@ namespace PingPongScout
 
         private void OpenKinect()
         {
-            _kinectSensor.Open();
-            _coordinateMapper = _kinectSensor.CoordinateMapper;
+            kinectSensor.Open();
+            coordinateMapper = kinectSensor.CoordinateMapper;
         }
 
         private void InitializeMultiSourceReader()
         {
-            _multiSourceFrameReader = _kinectSensor
+            multiSourceFrameReader = kinectSensor
                     .OpenMultiSourceFrameReader(FrameSourceTypes.Body | FrameSourceTypes.BodyIndex | FrameSourceTypes.Depth | FrameSourceTypes.Infrared | FrameSourceTypes.LongExposureInfrared);
 
-            _multiSourceFrameReader.MultiSourceFrameArrived += MultiSourceFrameArrived;
+            multiSourceFrameReader.MultiSourceFrameArrived += MultiSourceFrameArrived;
         }
 
         private void InitializeBitmap(int depthWidth, int depthHeight)
         {
             int pixelSizeInBytes = depthHeight * depthWidth * 32;
 
-            _infraredBitmapGenerator = new InfraredBitmapGenerator();
-            _depthBitmapGenerator = new DepthBitmapGenerator();
+            infraredBitmapGenerator = new InfraredBitmapGenerator();
+            depthBitmapGenerator = new DepthBitmapGenerator();
 
-            _infraredPixels = new byte[pixelSizeInBytes];
-            _depthPixels = new byte[pixelSizeInBytes];
-            _bodyIndexPixels = new byte[pixelSizeInBytes];
+            infraredPixels = new byte[pixelSizeInBytes];
+            depthPixels = new byte[pixelSizeInBytes];
+            bodyIndexPixels = new byte[pixelSizeInBytes];
 
         }
 
@@ -140,10 +141,10 @@ namespace PingPongScout
         {
             int depthArea = depthWidth * depthHeight;
 
-            _bodyData = new Body[_kinectSensor.BodyFrameSource.BodyCount];
-            _depthData = new ushort[depthArea];
-            _infraredData = new ushort[depthArea];
-            _bodyIndexData = new byte[depthArea];
+            bodyData = new Body[kinectSensor.BodyFrameSource.BodyCount];
+            depthData = new ushort[depthArea];
+            infraredData = new ushort[depthArea];
+            bodyIndexData = new byte[depthArea];
         }
 
         private void InitializeControllers()
@@ -181,6 +182,7 @@ namespace PingPongScout
             InitializeComponent();
             WindowState = cameraView == CameraType.None ? WindowState.Minimized : WindowState.Maximized;
             Visualization = cameraView == CameraType.Infrared ? Visualization.Infrared : Visualization.Depth;
+
         }
 
         #endregion
@@ -194,12 +196,12 @@ namespace PingPongScout
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            _kinectSensor = KinectSensor.GetDefault();
+            kinectSensor = KinectSensor.GetDefault();
 
-            if (_kinectSensor != null)
+            if (kinectSensor != null)
             {
-                int depthWidth = _kinectSensor.DepthFrameSource.FrameDescription.Width;
-                int depthHeight = _kinectSensor.DepthFrameSource.FrameDescription.Height;
+                int depthWidth = kinectSensor.DepthFrameSource.FrameDescription.Width;
+                int depthHeight = kinectSensor.DepthFrameSource.FrameDescription.Height;
 
                 AssignConstructors(depthHeight, depthHeight);
                 AssignEndOperations();
@@ -223,23 +225,23 @@ namespace PingPongScout
                     if (depthFrame != null && bodyIndexFrame != null)
                     {
                         timeStamp = depthFrame.RelativeTime;
-                        _depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
+                        depthBitmapGenerator.Update(depthFrame, bodyIndexFrame);
 
-                        _depthData = _depthBitmapGenerator.DepthData;
-                        _bodyIndexData = _depthBitmapGenerator.BodyData;
+                        depthData = depthBitmapGenerator.DepthData;
+                        bodyIndexData = depthBitmapGenerator.BodyData;
 
 
-                        depthTask = DataBaseController.GetDepthData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, _depthBitmapGenerator), token, FRAME_DATA_PATH + filePaths[0]);
+                        depthTask = DataBaseController.GetDepthData(new KeyValuePair<TimeSpan, DepthBitmapGenerator>(timeStamp, depthBitmapGenerator), token, FRAMEDATAPATH + filePaths[0]);
 
                         if (cameraView == CameraType.Depth)
                         {
                             camera.Source = DepthExtensions.ToLayeredBitmap(depthFrame, bodyIndexFrame);
 
-                            _depthPixels = _depthBitmapGenerator.Pixels;
-                            _bodyIndexPixels = _depthBitmapGenerator.HighlightedPixels;
+                            depthPixels = depthBitmapGenerator.Pixels;
+                            bodyIndexPixels = depthBitmapGenerator.HighlightedPixels;
                         }
                     }
-                    
+
                 }
 
 
@@ -249,19 +251,19 @@ namespace PingPongScout
                     {
                         timeStamp = infraredFrame.RelativeTime;
 
-                        _infraredBitmapGenerator.Update(infraredFrame);
+                        infraredBitmapGenerator.Update(infraredFrame);
 
-                        _infraredData = _infraredBitmapGenerator.InfraredData;
+                        infraredData = infraredBitmapGenerator.InfraredData;
 
 
-                        infraredTask = DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator), token, FRAME_DATA_PATH + filePaths[2]);
+                        infraredTask = DataBaseController.GetInfraredData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, infraredBitmapGenerator), token, FRAMEDATAPATH + filePaths[2]);
 
                         using (var longExposureFrame = reference.LongExposureInfraredFrameReference.AcquireFrame())
                         {
                             if (longExposureFrame != null)
                             {
-                                _longExposureData = _infraredBitmapGenerator.InfraredData;
-                                longExpTask = DataBaseController.GetLongExposureData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, _infraredBitmapGenerator), token, FRAME_DATA_PATH + filePaths[3]);
+                                longExposureData = infraredBitmapGenerator.InfraredData;
+                                longExpTask = DataBaseController.GetLongExposureData(new KeyValuePair<TimeSpan, InfraredBitmapGenerator>(timeStamp, infraredBitmapGenerator), token, FRAMEDATAPATH + filePaths[3]);
                             }
                         }
 
@@ -269,7 +271,7 @@ namespace PingPongScout
                         {
                             camera.Source = InfraredExtensions.ToBitmap(infraredFrame);
 
-                            _infraredPixels = _infraredBitmapGenerator.Pixels;
+                            infraredPixels = infraredBitmapGenerator.Pixels;
                         }
                     }
                 }
@@ -278,14 +280,14 @@ namespace PingPongScout
                 {
                     if (bodyFrame != null)
                     {
-                        bodyFrame.GetAndRefreshBodyData(_bodyData);
+                        bodyFrame.GetAndRefreshBodyData(bodyData);
                         timeStamp = bodyFrame.RelativeTime;
 
-                        var bodyData = BodyWrapper.Create(_bodyData
+                        var wrappedBodyData = BodyWrapper.Create(bodyData
                                                         .Where(b => b.IsTracked)
-                                                        .Closest(), _coordinateMapper, this.Visualization);
+                                                        .Closest(), coordinateMapper, this.Visualization);
 
-                        vitruviusTask = SessionController.GetVitruviusSingleData(new KeyValuePair<TimeSpan, BodyWrapper>(timeStamp, bodyData), token);
+                        vitruviusTask = SessionController.GetVitruviusSingleData(new KeyValuePair<TimeSpan, BodyWrapper>(timeStamp, wrappedBodyData), token);
                     }
                 }
 
@@ -304,9 +306,11 @@ namespace PingPongScout
             }
         }
 
-        //private void ScreenshotButton_Click(object sender, RoutedEventArgs e)
+
+
+        //private void ScreenshotButtonClick(object sender, RoutedEventArgs e)
         //{
-        //    var frame = _kinectSensor.DepthFrameSource;
+        //    var frame = kinectSensor.DepthFrameSource;
             
         //    // Then wait for the camera to give it one of its frames.
             
@@ -322,9 +326,9 @@ namespace PingPongScout
 
         //            BitmapEncoder encoder = new PngBitmapEncoder();
 
-        //            _depthBitmapGenerator.Update(depthFrame);
+        //            depthBitmapGenerator.Update(depthFrame);
 
-        //            var pic = _depthBitmapGenerator.Bitmap;
+        //            var pic = depthBitmapGenerator.Bitmap;
 
         //            encoder.Frames.Add(BitmapFrame.Create(pic));
 
@@ -345,7 +349,7 @@ namespace PingPongScout
         //        }
         //        else
         //        {
-        //            Console.WriteLine("depthBitmap was null: " + (_depthBitmapGenerator.Bitmap == null) + " at " + path);
+        //            Console.WriteLine("depthBitmap was null: " + (depthBitmapGenerator.Bitmap == null) + " at " + path);
         //        }
         //    }
 
